@@ -1,7 +1,7 @@
-parser grammar DynamoSQLParser;
+parser grammar PrimarSqlParser;
 
 options {
-    tokenVocab=DynamoSQLLexer;
+    tokenVocab=PrimarSqlLexer;
 }
 
 // Top Level Description
@@ -17,7 +17,7 @@ sqlStatements
 
 sqlStatement
     : ddlStatement | dmlStatement
-    | administrationStatement
+    | showStatement
     ;
 
 emptyStatement
@@ -35,10 +35,6 @@ dmlStatement
     | deleteStatement
     ;
 
-administrationStatement
-    : showStatement
-    ;
-
 // Data Definition Language
 
 //    Create statements
@@ -46,11 +42,7 @@ administrationStatement
 createTable
     : CREATE TABLE ifNotExists?
        tableName createDefinitions
-       ( tableOption (','? tableOption)* )?                     #columnCreateTable
-    ;
-
-functionParameter
-    : uid dataType
+       ( tableOption (','? tableOption)* )?
     ;
 
 createDefinitions
@@ -58,7 +50,7 @@ createDefinitions
     ;
 
 createDefinition
-    : uid columnDefinition                                          #columnDeclaration
+    : uid columnDefinition
     ;
 
 columnDefinition
@@ -71,7 +63,9 @@ columnConstraint
     ;
 
 tableOption
-    : THROUGHPUT '='? '(' decimalLiteral+ ',' decimalLiteral+ ')'   #tableOptionThroughput
+    : THROUGHPUT '='? '(' 
+        readCapacity=decimalLiteral ',' 
+        writeCapacity=decimalLiteral ')'                            #tableOptionThroughput
     | BILLINGMODE '='? (PROVISIONED | PAY_PER_REQUEST)              #tableBillingMode
     ;
 
@@ -85,7 +79,7 @@ alterTable
 // details
 
 alterSpecification
-    : tableOption (','? tableOption)*                               #alterByTableOption
+    : tableOption (','? tableOption)*
     ;
 
 
@@ -96,7 +90,7 @@ dropIndex
     ;
 
 dropTable
-    : DROP TABLE ifExists? tables
+    : DROP TABLE tableName
     ;
 
 //    Other DDL statements
@@ -127,7 +121,6 @@ insertStatement
 
 selectStatement
     : querySpecification                                            #simpleSelect
-    | queryExpression                                               #parenthesisSelect
     ;
 
 updateStatement
@@ -407,7 +400,7 @@ expression
     ;
 
 predicate
-    : predicate NOT? IN '(' (selectStatement | expressions) ')'     #inPredicate
+    : predicate NOT? IN '(' (expressions) ')'     #inPredicate
     | predicate IS nullNotnull                                      #isNullPredicate
     | left=predicate comparisonOperator right=predicate             #binaryComparasionPredicate
     | predicate NOT? BETWEEN predicate AND predicate                #betweenPredicate
@@ -419,7 +412,6 @@ expressionAtom
     : constant                                                      #constantExpressionAtom
     | fullColumnName                                                #fullColumnNameExpressionAtom
     | BINARY expressionAtom                                         #binaryExpressionAtom
-    | EXISTS '(' selectStatement ')'                                #existsExpessionAtom
     | left=expressionAtom bitOperator right=expressionAtom          #bitExpressionAtom
     ;
 

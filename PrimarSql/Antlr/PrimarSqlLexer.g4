@@ -1,11 +1,11 @@
-lexer grammar DynamoSQLLexer;
+lexer grammar PrimarSqlLexer;
 
-channels { MYSQLCOMMENT, ERRORCHANNEL }
+channels { PRIMARSQLCOMMENT, ERRORCHANNEL }
 
 // SKIP
 
 SPACE:                               [ \t\r\n]+    -> channel(HIDDEN);
-SPEC_MYSQL_COMMENT:                  '/*!' .+? '*/' -> channel(MYSQLCOMMENT);
+SPEC_MYSQL_COMMENT:                  '/*!' .+? '*/' -> channel(PRIMARSQLCOMMENT);
 COMMENT_INPUT:                       '/*' .*? '*/' -> channel(HIDDEN);
 LINE_COMMENT:                        (
                                        ('-- ' | '#') ~[\r\n]* ('\r'? '\n' | EOF) 
