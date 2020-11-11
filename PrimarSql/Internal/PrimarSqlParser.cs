@@ -321,7 +321,6 @@ namespace PrimarSql.Internal
             public IDecimalLiteralNode WriteCapacity => writeCapacity;
         }
 
-        #region DB Objects
         internal partial class UidContext : IUidNode
         {
             public IEnumerable<ITree> Children
@@ -405,7 +404,6 @@ namespace PrimarSql.Internal
 
             public ITerminalNode TwoDecimal => TWO_DECIMAL();
         }
-        #endregion
 
         internal partial class KeywordsCanBeIdContext : IKeywordCanBeIdNode
         {
