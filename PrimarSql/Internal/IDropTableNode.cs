@@ -1,6 +1,6 @@
 ﻿namespace PrimarSql.Internal
 {
-    public interface IDottedIdContext : INode
+    public interface IDropTableNode : INode
     {
         
     }

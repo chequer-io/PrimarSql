@@ -69,15 +69,8 @@ FLOAT:                               'FLOAT';
 DECIMAL:                             'DECIMAL';
 DEC:                                 'DEC';
 NUMERIC:                             'NUMERIC';
-DATE:                                'DATE';
-TIME:                                'TIME';
-TIMESTAMP:                           'TIMESTAMP';
-DATETIME:                            'DATETIME';
-YEAR:                                'YEAR';
 CHAR:                                'CHAR';
 VARCHAR:                             'VARCHAR';
-NVARCHAR:                            'NVARCHAR';
-NATIONAL:                            'NATIONAL';
 BINARY:                              'BINARY';
 VARBINARY:                           'VARBINARY';
 TINYBLOB:                            'TINYBLOB';
@@ -88,7 +81,6 @@ TINYTEXT:                            'TINYTEXT';
 TEXT:                                'TEXT';
 MEDIUMTEXT:                          'MEDIUMTEXT';
 LONGTEXT:                            'LONGTEXT';
-ENUM:                                'ENUM';
 VARYING:                             'VARYING';
 SERIAL:                              'SERIAL';
 STRING:                              'STRING';
@@ -111,18 +103,6 @@ THROUGHPUT:                          'THROUGHPUT';
 BILLINGMODE:                         'BILLINGMODE';
 PROVISIONED:                         'PROVISIONED';
 PAY_PER_REQUEST:                     'PAY_PER_REQUEST';
-
-// Interval type Keywords
-
-QUARTER:                             'QUARTER';
-MONTH:                               'MONTH';
-DAY:                                 'DAY';
-HOUR:                                'HOUR';
-MINUTE:                              'MINUTE';
-WEEK:                                'WEEK';
-SECOND:                              'SECOND';
-MICROSECOND:                         'MICROSECOND';
-
 
 // PRIVILEGES
 
@@ -185,40 +165,11 @@ REAL_LITERAL:                        (DEC_DIGIT+)? '.' DEC_DIGIT+
 NULL_SPEC_LITERAL:                   '\\' 'N';
 BIT_STRING:                          BIT_STRING_L;
 
-
-// Hack for dotID
-// Prevent recognize string:         .123somelatin AS ((.123), FLOAT_LITERAL), ((somelatin), ID)
-//  it must recoginze:               .123somelatin AS ((.), DOT), (123somelatin, ID)
-
-DOT_ID:                              '.' ID_LITERAL;
-
-
-
 // Identifiers
 
 ID:                                  ID_LITERAL;
 DOUBLE_QUOTE_ID:                     '"' ~'"'+ '"';
 REVERSE_QUOTE_ID:                    '`' ~'`'+ '`';
-STRING_USER_NAME:                    (
-                                       SQUOTA_STRING | DQUOTA_STRING 
-                                       | BQUOTA_STRING | ID_LITERAL
-                                     ) '@' 
-                                     (
-                                       SQUOTA_STRING | DQUOTA_STRING 
-                                       | BQUOTA_STRING | ID_LITERAL
-                                     );
-LOCAL_ID:                            '@'
-                                (
-                                  [A-Z0-9._$]+ 
-                                  | SQUOTA_STRING
-                                  | DQUOTA_STRING
-                                  | BQUOTA_STRING
-                                );
-GLOBAL_ID:                           '@' '@' 
-                                (
-                                  [A-Z0-9._$]+ 
-                                  | BQUOTA_STRING
-                                );
 
 
 // Fragments for Literal primitives

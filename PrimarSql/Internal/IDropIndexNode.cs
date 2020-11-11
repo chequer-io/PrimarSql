@@ -1,6 +1,6 @@
 ﻿namespace PrimarSql.Internal
 {
-    public interface IEmptyStatementContext : INode
+    public interface IDropIndexNode : INode
     {
         
     }

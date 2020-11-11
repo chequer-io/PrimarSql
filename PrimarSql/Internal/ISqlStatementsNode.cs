@@ -3,11 +3,11 @@ using Antlr4.Runtime.Tree;
 
 namespace PrimarSql.Internal
 {
-    public interface ISqlStatementsContext : INode
+    public interface ISqlStatementsNode : INode
     {
-        IEnumerable<ISqlStatementContext> SqlStatements { get; }
+        IEnumerable<ISqlStatementNode> SqlStatements { get; }
         
-        IEnumerable<IEmptyStatementContext> EmptyStatements { get; }
+        IEnumerable<IEmptyStatementNode> EmptyStatements { get; }
         
         IEnumerable<ITerminalNode> MINUSMINUS { get; }
         

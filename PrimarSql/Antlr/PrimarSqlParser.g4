@@ -136,11 +136,7 @@ insertStatementValue
     ;
 
 updatedElement
-    : fullColumnName '=' (expression)
-    ;
-
-assignmentField
-    : uid | LOCAL_ID
+    : uid '=' (expression)
     ;
 
 //    Detailed DML Statements
@@ -216,8 +212,7 @@ selectElements
     ;
 
 selectElement
-    : fullId '.' '*'                                                #selectStarElement
-    | fullColumnName (AS? alias=uid)?                               #selectColumnElement
+    : uid (AS? alias=uid)?
     ;
 
 fromClause
@@ -248,32 +243,8 @@ showStatement
 
 //    DB Objects
 
-fullId
-    : uid dottedId?
-    ;
-
 tableName
-    : fullId
-    ;
-
-fullColumnName
-    : uid (dottedId dottedId? )?
-    ;
-
-indexColumnName
-    : (uid | STRING_LITERAL) ('(' decimalLiteral ')')? sortType=(ASC | DESC)?
-    ;
-
-userName
-    : STRING_USER_NAME | ID | STRING_LITERAL;
-
-collationName
-    : uid | STRING_LITERAL;
-
-uuidSet
-    : decimalLiteral '-' decimalLiteral '-' decimalLiteral
-      '-' decimalLiteral '-' decimalLiteral
-      (':' decimalLiteral '-' decimalLiteral)+
+    : uid
     ;
 
 uid
@@ -284,17 +255,8 @@ uid
 
 simpleId
     : ID
-    | privilegesBase
-    | intervalTypeBase
-    | dataTypeBase
     | keywordsCanBeId
     ;
-
-dottedId
-    : DOT_ID
-    | '.' uid
-    ;
-
 
 //    Literals
 
@@ -347,14 +309,6 @@ uidList
     : uid (',' uid)*
     ;
 
-tables
-    : tableName (',' tableName)*
-    ;
-
-indexColumnNames
-    : '(' indexColumnName (',' indexColumnName)* ')'
-    ;
-
 expressions
     : expression (',' expression)*
     ;
@@ -363,30 +317,11 @@ expressionsWithDefaults
     : expressionOrDefault (',' expressionOrDefault)*
     ;
 
-constants
-    : constant (',' constant)*
-    ;
-
-simpleStrings
-    : STRING_LITERAL (',' STRING_LITERAL)*
-    ;
-
-userVariables
-    : LOCAL_ID (',' LOCAL_ID)*
-    ;
-
 //    Common Expressons
-
-defaultValue
-    : NULL_LITERAL
-    ;
 
 expressionOrDefault
     : expression | DEFAULT
     ;
-
-ifExists
-    : IF EXISTS;
 
 ifNotExists
     : IF NOT EXISTS;
@@ -410,7 +345,6 @@ predicate
 // Add in ASTVisitor nullNotnull in constant
 expressionAtom
     : constant                                                      #constantExpressionAtom
-    | fullColumnName                                                #fullColumnNameExpressionAtom
     | BINARY expressionAtom                                         #binaryExpressionAtom
     | left=expressionAtom bitOperator right=expressionAtom          #bitExpressionAtom
     ;
@@ -428,26 +362,9 @@ bitOperator
     : '<' '<' | '>' '>' | '&' | '^' | '|'
     ;
 
-//    Simple id sets
-//     (that keyword, which can be id)
-
-privilegesBase
-    : TABLES
-    ;
-
-intervalTypeBase
-    : QUARTER | MONTH | DAY | HOUR
-    | MINUTE | WEEK | SECOND | MICROSECOND
-    ;
-
-dataTypeBase
-    : DATE | TIME | TIMESTAMP | DATETIME | YEAR | ENUM | TEXT
-    ;
-
 keywordsCanBeId
     : COLUMNS | FIELDS | HASH | INDEXES | LIST
     | SERIAL | STRING
-    | TRUNCATE | VALUE | DATE | TIME | TIMESTAMP | DATETIME | YEAR | NVARCHAR | NATIONAL | TEXT | ENUM 
-    | QUARTER | MONTH | DAY | HOUR | MINUTE 
-    | WEEK | SECOND | MICROSECOND | TABLES
+    | TRUNCATE | VALUE | TEXT 
+    | TABLES | IN
     ;

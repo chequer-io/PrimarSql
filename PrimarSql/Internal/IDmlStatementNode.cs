@@ -1,6 +1,6 @@
 ﻿namespace PrimarSql.Internal
 {
-    public interface IIfNotExistsContext : INode
+    public interface IDmlStatementNode : INode
     {
         
     }

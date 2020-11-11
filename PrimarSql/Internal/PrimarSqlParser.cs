@@ -1,29 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 
 namespace PrimarSql.Internal
 {
     internal partial class PrimarSqlParser
     {
-        internal partial class RootContext : IRootContext
+        internal partial class RootContext : IRootNode
         {
-            public IEnumerable<INode> Children
+            public IEnumerable<ITree> Children
             {
-                get { yield return SqlStatements; }
+                get
+                {
+                    yield return SqlStatements;
+                    yield return MINUSMINUS();
+                }
             }
 
-            public ISqlStatementsContext SqlStatements
+            public ISqlStatementsNode SqlStatements
                 => sqlStatements();
 
-            ITerminalNode IRootContext.MINUSMINUS => MINUSMINUS();
+            ITerminalNode IRootNode.MINUSMINUS => MINUSMINUS();
         }
 
-        internal partial class SqlStatementsContext : ISqlStatementsContext
+        internal partial class SqlStatementsContext : ISqlStatementsNode
         {
-            public IEnumerable<INode> Children
+            public IEnumerable<ITree> Children
             {
                 get
                 {
@@ -32,21 +34,27 @@ namespace PrimarSql.Internal
 
                     foreach (var emptyStatement in EmptyStatements)
                         yield return emptyStatement;
+
+                    foreach (var m in MINUSMINUS())
+                        yield return m;
+
+                    foreach (var s in SEMI())
+                        yield return s;
                 }
             }
 
-            public IEnumerable<ISqlStatementContext> SqlStatements => sqlStatement();
+            public IEnumerable<ISqlStatementNode> SqlStatements => sqlStatement();
 
-            public IEnumerable<IEmptyStatementContext> EmptyStatements => emptyStatement();
+            public IEnumerable<IEmptyStatementNode> EmptyStatements => emptyStatement();
 
-            IEnumerable<ITerminalNode> ISqlStatementsContext.MINUSMINUS => MINUSMINUS();
+            IEnumerable<ITerminalNode> ISqlStatementsNode.MINUSMINUS => MINUSMINUS();
 
-            IEnumerable<ITerminalNode> ISqlStatementsContext.SEMI => SEMI();
+            IEnumerable<ITerminalNode> ISqlStatementsNode.SEMI => SEMI();
         }
 
-        internal partial class SqlStatementContext : ISqlStatementContext
+        internal partial class SqlStatementContext : ISqlStatementNode
         {
-            public IEnumerable<INode> Children
+            public IEnumerable<ITree> Children
             {
                 get
                 {
@@ -61,21 +69,26 @@ namespace PrimarSql.Internal
                 }
             }
 
-            public IDdlStatementContext DdlStatement => ddlStatement();
+            public IDdlStatementNode DdlStatement => ddlStatement();
 
-            public IDmlStatementContext DmlStatement => dmlStatement();
+            public IDmlStatementNode DmlStatement => null; // dmlStatement();
 
-            public IShowStatementContext ShowStatement => showStatement();
+            public IShowStatementNode ShowStatement => null; // showStatement();
         }
 
-        internal partial class EmptyStatementContext : IEmptyStatementContext
+        internal partial class EmptyStatementContext : IEmptyStatementNode
         {
-            public IEnumerable<INode> Children => Enumerable.Empty<INode>();
+            public IEnumerable<ITree> Children
+            {
+                get { yield return SEMI(); }
+            }
+
+            ITerminalNode IEmptyStatementNode.SEMI => SEMI();
         }
 
-        internal partial class DdlStatementContext : IDdlStatementContext
+        internal partial class DdlStatementContext : IDdlStatementNode
         {
-            public IEnumerable<INode> Children
+            public IEnumerable<ITree> Children
             {
                 get
                 {
@@ -96,62 +109,65 @@ namespace PrimarSql.Internal
                 }
             }
 
-            public ICreateTableContext CreateTable => createTable();
+            public ICreateTableNode CreateTable => createTable();
 
-            public IAlterTableContext AlterTable => alterTable();
+            public IAlterTableNode AlterTable => alterTable();
 
-            public IDropIndexContext DropIndex => dropIndex();
+            public IDropIndexNode DropIndex => dropIndex();
 
-            public IDropTableContext DropTable => dropTable();
+            public IDropTableNode DropTable => dropTable();
 
-            public ITruncateTableContext TruncateTable => truncateTable();
+            public ITruncateTableNode TruncateTable => truncateTable();
         }
-
-        internal partial class DmlStatementContext : IDmlStatementContext
-        {
-        }
-
-        internal partial class ShowStatementContext : IShowStatementContext
-        {
-        }
+        //
+        // internal partial class DmlStatementContext : IDmlStatementNode
+        // {
+        // }
+        //
+        // internal partial class ShowStatementContext : IShowStatementNode
+        // {
+        // }
 
         #region DDL Statement
-        internal partial class CreateTableContext : ICreateTableContext
+        internal partial class CreateTableContext : ICreateTableNode
         {
-            public IEnumerable<INode> Children
+            public IEnumerable<ITree> Children
             {
                 get
                 {
-                    yield return ifNotExists();
-                    yield return TableName;
-                    yield return CreateDefinitions;
+                    if (IfNotExists != null)
+                        yield return IfNotExists;
+
+                    if (TableName != null)
+                        yield return TableName;
+
+                    if (CreateDefinitions != null)
+                        yield return CreateDefinitions;
 
                     foreach (var tableOption in TableOptions)
-                    {
                         yield return tableOption;
-                    }
                 }
             }
 
-            IIfNotExistsContext ICreateTableContext.IfNotExists => ifNotExists();
+            public IIfNotExistsNode IfNotExists => ifNotExists();
 
-            public ITableNameContext TableName => tableName();
+            public ITableNameNode TableName => tableName();
 
-            public ICreateDefinitionsContext CreateDefinitions => createDefinitions();
+            public ICreateDefinitionsNode CreateDefinitions => createDefinitions();
 
-            public IEnumerable<ITableOptionContext> TableOptions => tableOption();
+            public IEnumerable<ITableOptionNode> TableOptions => tableOption();
         }
 
-        internal partial class CreateDefinitionsContext : ICreateDefinitionsContext
+        internal partial class CreateDefinitionsContext : ICreateDefinitionsNode
         {
-            public IEnumerable<INode> Children => CreateDefinitions;
+            public IEnumerable<ITree> Children => CreateDefinitions;
 
-            public IEnumerable<ICreateDefinitionContext> CreateDefinitions => createDefinition();
+            public IEnumerable<ICreateDefinitionNode> CreateDefinitions => createDefinition();
         }
 
-        internal partial class CreateDefinitionContext : ICreateDefinitionContext
+        internal partial class CreateDefinitionContext : ICreateDefinitionNode
         {
-            public IEnumerable<INode> Children
+            public IEnumerable<ITree> Children
             {
                 get
                 {
@@ -160,167 +176,304 @@ namespace PrimarSql.Internal
                 }
             }
 
-            public IUidContext Uid => uid();
+            public IUidNode Uid => uid();
 
-            public IColumnDefinitionContext ColumnDefinition => columnDefinition();
+            public IColumnDefinitionNode ColumnDefinition => columnDefinition();
         }
 
-        internal partial class ColumnDefinitionContext : IColumnDefinitionContext
+        internal partial class ColumnDefinitionContext : IColumnDefinitionNode
         {
-            public IEnumerable<INode> Children
+            public IEnumerable<ITree> Children
             {
                 get
                 {
-                    yield return DataType;
+                    if (DataType != null)
+                        yield return DataType;
 
                     foreach (var columnConstraint in ColumnConstraints)
                         yield return columnConstraint;
                 }
             }
 
-            public IDataTypeContext DataType => dataType();
+            public IDataTypeNode DataType => dataType();
 
-            public IEnumerable<IColumnConstraintContext> ColumnConstraints => columnConstraint();
+            public IEnumerable<IColumnConstraintNode> ColumnConstraints => columnConstraint();
         }
 
-        internal partial class DataTypeContext : IDataTypeContext
+        internal partial class DataTypeContext : IDataTypeNode
         {
-            public IEnumerable<INode> Children => Enumerable.Empty<INode>();
-
-            public IToken TypeName => typeName;
-        }
-
-        internal partial class AlterSpecificationContext : IAlterSpecificationContext
-        {
-            public IEnumerable<INode> Children => TableOption;
-
-            public IEnumerable<ITableOptionContext> TableOption => tableOption();
-        }
-
-        internal partial class DropIndexContext : IDropIndexContext
-        {
-            public IEnumerable<INode> Children
+            public IEnumerable<ITree> Children
             {
                 get
                 {
-                    yield return Uid;
-                    yield return TableName;
+                    if (Varchar != null) yield return Varchar;
+                    if (Text != null) yield return Text;
+                    if (Mediumtext != null) yield return Mediumtext;
+                    if (Longtext != null) yield return Longtext;
+                    if (String != null) yield return String;
+                    if (Int != null) yield return Int;
+                    if (Integer != null) yield return Integer;
+                    if (Bigint != null) yield return Bigint;
+                    if (Bool != null) yield return Bool;
+                    if (Boolean != null) yield return Boolean;
+                    if (List != null) yield return List;
+                    if (Binary != null) yield return Binary;
+                    if (NumberList != null) yield return NumberList;
+                    if (StringList != null) yield return StringList;
                 }
             }
 
-            public IUidContext Uid => uid();
+            public ITerminalNode Varchar => VARCHAR();
 
-            public ITableNameContext TableName => tableName();
+            public ITerminalNode Text => TEXT();
+
+            public ITerminalNode Mediumtext => MEDIUMTEXT();
+
+            public ITerminalNode Longtext => LONGTEXT();
+
+            public ITerminalNode String => STRING();
+
+            public ITerminalNode Int => INT();
+
+            public ITerminalNode Integer => INTEGER();
+
+            public ITerminalNode Bigint => BIGINT();
+
+            public ITerminalNode Bool => BOOL();
+
+            public ITerminalNode Boolean => BOOLEAN();
+
+            public ITerminalNode List => LIST();
+
+            public ITerminalNode Binary => BINARY();
+
+            public ITerminalNode NumberList => NUMBER_LIST();
+
+            public ITerminalNode StringList => STRING_LIST();
         }
 
-        internal partial class DropTableContext : IDropTableContext
+        internal partial class AlterSpecificationContext : IAlterSpecificationNode
         {
-            public IEnumerable<INode> Children
+            public IEnumerable<ITree> Children => TableOption;
+
+            public IEnumerable<ITableOptionNode> TableOption => tableOption();
+        }
+
+        internal partial class DropIndexContext : IDropIndexNode
+        {
+            public IEnumerable<ITree> Children
+            {
+                get
+                {
+                    if (Uid != null)
+                        yield return Uid;
+
+                    if (TableName != null)
+                        yield return TableName;
+                }
+            }
+
+            public IUidNode Uid => uid();
+
+            public ITableNameNode TableName => tableName();
+        }
+
+        internal partial class DropTableContext : IDropTableNode
+        {
+            public IEnumerable<ITree> Children
             {
                 get { yield return TableName; }
             }
 
-            public ITableNameContext TableName => tableName();
+            public ITableNameNode TableName => tableName();
         }
 
-        internal partial class TruncateTableContext : ITruncateTableContext
+        internal partial class TruncateTableContext : ITruncateTableNode
         {
-            public IEnumerable<INode> Children
+            public IEnumerable<ITree> Children
             {
                 get { yield return TableName; }
             }
 
-            public ITableNameContext TableName => tableName();
+            public ITableNameNode TableName => tableName();
         }
         #endregion
 
-        internal partial class IfNotExistsContext : IIfNotExistsContext
+        internal partial class IfNotExistsContext : IIfNotExistsNode
         {
-            public IEnumerable<INode> Children => Enumerable.Empty<INode>();
+            public IEnumerable<ITree> Children => Enumerable.Empty<INode>();
         }
 
-        internal partial class ColumnConstraintContext : IColumnConstraintContext
+        internal partial class ColumnConstraintContext : IColumnConstraintNode
         {
-            public IEnumerable<INode> Children => Enumerable.Empty<INode>();
+            public IEnumerable<ITree> Children => Enumerable.Empty<INode>();
         }
 
-        internal partial class TableOptionContext : ITableOptionContext
+        internal partial class TableOptionContext : ITableOptionNode
         {
-            public IEnumerable<INode> Children => Enumerable.Empty<INode>();
+            public IEnumerable<ITree> Children => Enumerable.Empty<INode>();
         }
 
-        internal partial class TableOptionThroughputContext : ITableOptionThroughputContext
+        internal partial class TableOptionThroughputContext : ITableOptionThroughputNode
         {
-            public int ReadCapacity => int.TryParse(readCapacity.GetText(), out int i) ? i : -1;
+            public IDecimalLiteralNode ReadCapacity => readCapacity;
 
-            public int WriteCapacity => int.TryParse(writeCapacity.GetText(), out int i) ? i : -1;
+            public IDecimalLiteralNode WriteCapacity => writeCapacity;
         }
 
         #region DB Objects
-        internal partial class UidContext : IUidContext
+        internal partial class UidContext : IUidNode
         {
-            public IEnumerable<INode> Children
+            public IEnumerable<ITree> Children
             {
                 get { yield return SimpleId; }
             }
 
-            public ISimpleIdContext SimpleId => simpleId();
-
-            public string Text => GetText();
+            public ISimpleIdNode SimpleId => simpleId();
         }
 
-        internal partial class TableNameContext : ITableNameContext
+        internal partial class TableNameContext : ITableNameNode
         {
-            public IEnumerable<INode> Children
+            public IEnumerable<ITree> Children
             {
                 get
                 {
-                    yield return FullId;
+                    if (Uid != null)
+                        yield return Uid;
                 }
             }
 
-            public IFullIdContext FullId => fullId();
+            public IUidNode Uid => uid();
         }
 
-        internal partial class AlterTableContext : IAlterTableContext
+        internal partial class AlterTableContext : IAlterTableNode
         {
-            public IEnumerable<INode> Children
+            public IEnumerable<ITree> Children
             {
                 get
                 {
-                    yield return TableName;
+                    if (TableName != null)
+                        yield return TableName;
 
                     foreach (var alterSpecification in AlterSpecifications)
                         yield return alterSpecification;
                 }
             }
 
-            public ITableNameContext TableName => tableName();
+            public ITableNameNode TableName => tableName();
 
-            public IEnumerable<IAlterSpecificationContext> AlterSpecifications => alterSpecification();
+            public IEnumerable<IAlterSpecificationNode> AlterSpecifications => alterSpecification();
         }
 
-        internal partial class SimpleIdContext : ISimpleIdContext
+        internal partial class SimpleIdContext : ISimpleIdNode
         {
-            public IEnumerable<INode> Children => Enumerable.Empty<INode>();
+            public IEnumerable<ITree> Children
+            {
+                get
+                {
+                    if (Id != null)
+                        yield return Id;
 
-            ITerminalNode ISimpleIdContext.ID => ID();
+                    if (KeywordsCanBeId != null)
+                        yield return KeywordsCanBeId;
+                }
+            }
+
+            public ITerminalNode Id => ID();
+
+            public IKeywordCanBeIdNode KeywordsCanBeId => keywordsCanBeId();
         }
 
-        internal partial class FullIdContext : IFullIdContext
+        internal partial class DecimalLiteralContext : IDecimalLiteralNode
         {
-            public IEnumerable<INode> Children { get; }
-            
-            public IUidContext Uid => uid();
+            public IEnumerable<ITree> Children
+            {
+                get
+                {
+                    if (DecimalLiteral != null) yield return DecimalLiteral;
+                    if (ZeroDecimal != null) yield return ZeroDecimal;
+                    if (OneDecimal != null) yield return OneDecimal;
+                    if (TwoDecimal != null) yield return TwoDecimal;
+                }
+            }
 
-            public IDottedIdContext DottedId => dottedId();
-        }
+            public ITerminalNode DecimalLiteral => DECIMAL_LITERAL();
 
-        internal partial class DottedIdContext : IDottedIdContext
-        {
-            public IEnumerable<INode> Children { get; }
+            public ITerminalNode ZeroDecimal => ZERO_DECIMAL();
+
+            public ITerminalNode OneDecimal => ONE_DECIMAL();
+
+            public ITerminalNode TwoDecimal => TWO_DECIMAL();
         }
-        
         #endregion
+
+        internal partial class KeywordsCanBeIdContext : IKeywordCanBeIdNode
+        {
+            public IEnumerable<ITree> Children
+            {
+                get
+                {
+                    if (Columns != null)
+                        yield return Columns;
+
+                    if (Fields != null)
+                        yield return Fields;
+
+                    if (Hash != null)
+                        yield return Hash;
+
+                    if (Indexes != null)
+                        yield return Indexes;
+
+                    if (List != null)
+                        yield return List;
+
+                    if (Serial != null)
+                        yield return Serial;
+
+                    if (String != null)
+                        yield return String;
+
+                    if (Truncate != null)
+                        yield return Truncate;
+
+                    if (Value != null)
+                        yield return Value;
+
+                    if (Text != null)
+                        yield return Text;
+
+                    if (Tables != null)
+                        yield return Tables;
+
+                    if (In != null)
+                        yield return In;
+                }
+            }
+
+            public ITerminalNode Columns => COLUMNS();
+
+            public ITerminalNode Fields => FIELDS();
+
+            public ITerminalNode Hash => HASH();
+
+            public ITerminalNode Indexes => INDEXES();
+
+            public ITerminalNode List => LIST();
+
+            public ITerminalNode Serial => SERIAL();
+
+            public ITerminalNode String => STRING();
+
+            public ITerminalNode Truncate => TRUNCATE();
+
+            public ITerminalNode Value => VALUE();
+
+            public ITerminalNode Text => TEXT();
+
+            public ITerminalNode Tables => TABLES();
+
+            public ITerminalNode In => IN();
+        }
     }
 }

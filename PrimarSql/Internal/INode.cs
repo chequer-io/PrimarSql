@@ -3,8 +3,8 @@ using Antlr4.Runtime.Tree;
 
 namespace PrimarSql.Internal
 {
-    public interface INode
+    public interface INode : ITree
     {
-        IEnumerable<INode> Children { get; }
+        IEnumerable<ITree> Children { get; }
     }
 }

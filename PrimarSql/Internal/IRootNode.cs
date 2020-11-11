@@ -2,9 +2,9 @@
 
 namespace PrimarSql.Internal
 {
-    public interface IRootContext : INode
+    public interface IRootNode : INode
     {
-        public ISqlStatementsContext SqlStatements { get; }
+        public ISqlStatementsNode SqlStatements { get; }
         
         public ITerminalNode MINUSMINUS { get; }
         

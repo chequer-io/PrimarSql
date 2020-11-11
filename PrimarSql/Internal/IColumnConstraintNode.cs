@@ -1,6 +1,6 @@
 ﻿namespace PrimarSql.Internal
 {
-    public interface ITableOptionContext : INode
+    public interface IColumnConstraintNode : INode
     {
         
     }
