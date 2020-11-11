@@ -8,8 +8,4 @@
       <PackageReference Include="Antlr4.Runtime.Standard" Version="4.8.0" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Nodes" />
-    </ItemGroup>
-
 </Project>
