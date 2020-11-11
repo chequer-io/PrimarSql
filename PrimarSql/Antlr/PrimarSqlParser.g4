@@ -66,7 +66,7 @@ tableOption
     : THROUGHPUT '='? '(' 
         readCapacity=decimalLiteral ',' 
         writeCapacity=decimalLiteral ')'                            #tableOptionThroughput
-    | BILLINGMODE '='? (PROVISIONED | PAY_PER_REQUEST)              #tableBillingMode
+    | BILLINGMODE '='? billingMode=(PROVISIONED | PAY_PER_REQUEST)  #tableBillingMode
     ;
 
 //    Alter statements

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 
 namespace PrimarSql.Internal
@@ -311,16 +312,46 @@ namespace PrimarSql.Internal
 
         internal partial class TableOptionContext : ITableOptionNode
         {
-            public IEnumerable<ITree> Children => Enumerable.Empty<INode>();
+            public virtual IEnumerable<ITree> Children => Enumerable.Empty<INode>();
         }
 
         internal partial class TableOptionThroughputContext : ITableOptionThroughputNode
         {
+            public override IEnumerable<ITree> Children
+            {
+                get
+                {
+                    yield return ReadCapacity;
+                    yield return WriteCapacity;
+                }
+            }
+
             public IDecimalLiteralNode ReadCapacity => readCapacity;
 
             public IDecimalLiteralNode WriteCapacity => writeCapacity;
         }
 
+        internal partial class TableBillingModeContext : ITableBillingModeNode
+        {
+            public override IEnumerable<ITree> Children
+            {
+                get
+                {
+                    if (Provisioned != null)
+                        yield return Provisioned;
+                    
+                    if (PayPerRequest != null)
+                        yield return PayPerRequest;
+                }
+            }
+
+            public ITerminalNode Provisioned => PROVISIONED();
+
+            public ITerminalNode PayPerRequest => PAY_PER_REQUEST();
+
+            public IToken BillingMode => billingMode;
+        }
+        
         internal partial class UidContext : IUidNode
         {
             public IEnumerable<ITree> Children
