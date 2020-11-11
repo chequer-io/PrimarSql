@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
@@ -242,7 +243,7 @@ namespace PrimarSql.Internal
         {
             public IEnumerable<INode> Children => Enumerable.Empty<INode>();
         }
-        
+
         internal partial class TableOptionContext : ITableOptionContext
         {
             public IEnumerable<INode> Children => Enumerable.Empty<INode>();
@@ -254,20 +255,31 @@ namespace PrimarSql.Internal
 
             public int WriteCapacity => int.TryParse(writeCapacity.GetText(), out int i) ? i : -1;
         }
-        
+
         #region DB Objects
         internal partial class UidContext : IUidContext
         {
-            public IEnumerable<INode> Children { get; }
+            public IEnumerable<INode> Children
+            {
+                get { yield return SimpleId; }
+            }
 
             public ISimpleIdContext SimpleId => simpleId();
-            
+
             public string Text => GetText();
         }
 
         internal partial class TableNameContext : ITableNameContext
         {
-            public IEnumerable<INode> Children { get; }
+            public IEnumerable<INode> Children
+            {
+                get
+                {
+                    yield return FullId;
+                }
+            }
+
+            public IFullIdContext FullId => fullId();
         }
 
         internal partial class AlterTableContext : IAlterTableContext
@@ -287,6 +299,28 @@ namespace PrimarSql.Internal
 
             public IEnumerable<IAlterSpecificationContext> AlterSpecifications => alterSpecification();
         }
+
+        internal partial class SimpleIdContext : ISimpleIdContext
+        {
+            public IEnumerable<INode> Children => Enumerable.Empty<INode>();
+
+            ITerminalNode ISimpleIdContext.ID => ID();
+        }
+
+        internal partial class FullIdContext : IFullIdContext
+        {
+            public IEnumerable<INode> Children { get; }
+            
+            public IUidContext Uid => uid();
+
+            public IDottedIdContext DottedId => dottedId();
+        }
+
+        internal partial class DottedIdContext : IDottedIdContext
+        {
+            public IEnumerable<INode> Children { get; }
+        }
+        
         #endregion
     }
 }
