@@ -47,7 +47,7 @@ Function Antlr-Generate {
         Write-Host " Patch $($PSItem.Name)" -ForegroundColor Yellow
 
         $Content = Get-Content -Path $PSItem -Raw
-        $Content = $Content -replace 'public(?= +(?:interface|(?:partial +)?class) +[\w<>]+)', 'internal'
+        # $Content = $Content -replace 'public(?= +(?:interface|(?:partial +)?class) +[\w<>]+)', 'internal'
         $Content = $Content -replace '\s+\[System\.CLSCompliant\(false\)\]', ''
 
         Set-Content -Path $PSItem -Value $Content
