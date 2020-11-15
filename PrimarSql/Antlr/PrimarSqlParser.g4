@@ -4,8 +4,6 @@ options {
     tokenVocab=PrimarSqlLexer;
 }
 
-// Top Level Description
-
 root
     : sqlStatements? MINUSMINUS? EOF
     ;
@@ -17,7 +15,7 @@ sqlStatements
 
 sqlStatement
     : ddlStatement | dmlStatement
-    | showStatement
+    | describeStatement | showStatement
     ;
 
 emptyStatement
@@ -25,19 +23,32 @@ emptyStatement
     ;
 
 ddlStatement
-    : createTable 
-    | alterTable | dropIndex
-    | dropTable | truncateTable
+    : createIndex | createTable | alterTable
+    | dropIndex | dropTable
     ;
 
 dmlStatement
-    : selectStatement | insertStatement | updateStatement
-    | deleteStatement
+    : selectStatement | insertStatement 
+    | updateStatement | deleteStatement
     ;
 
-// Data Definition Language
+// ddl statement
 
-//    Create statements
+createIndex
+    : CREATE indexSpec? INDEX uid
+    ON tableName primaryKeyColumns
+    indexOption?
+    ;
+
+indexSpec
+    : LOCAL | GLOBAL
+    ;
+
+indexOption
+    : ALL
+    | KEYS ONLY
+    | INCLUDE '(' uid (',' uid)* ')'
+    ;
 
 createTable
     : CREATE TABLE ifNotExists?
@@ -50,7 +61,9 @@ createDefinitions
     ;
 
 createDefinition
-    : uid columnDefinition
+    : uid columnDefinition                                          #columnDeclaration
+    | tableConstraint                                               #constraintDeclaration
+    | indexColumnDefinition                                         #indexDeclaration
     ;
 
 columnDefinition
@@ -62,138 +75,79 @@ columnConstraint
     | RANGE KEY                                                     #rangeKeyColumnConstraint
     ;
 
+tableConstraint
+    : HASH KEY index=uid?                                           #hashKeyTableConstraint
+    | RANGE KEY index=uid?                                          #rangeKeyTableConstraint
+    ;
+
+indexColumnDefinition
+    : indexType=(LOCAL | GLOBAL)? INDEX 
+        uid primaryKeyColumns indexOption?
+    ;
+
 tableOption
     : THROUGHPUT '='? '(' 
         readCapacity=decimalLiteral ',' 
-        writeCapacity=decimalLiteral ')'                            #tableOptionThroughput
-    | BILLINGMODE '='? billingMode=(PROVISIONED | PAY_PER_REQUEST)  #tableBillingMode
+        writeCapacity=decimalLiteral ')'                                      #tableOptionThroughput
+    | BILLINGMODE '='? billingMode=(PROVISIONED | PAY_PER_REQUEST| ON_DEMAND) #tableBillingMode
     ;
-
-//    Alter statements
 
 alterTable
-    : ALTER TABLE tableName
-      (alterSpecification (',' alterSpecification)*)?
+    : ALTER TABLE tableName 
+       (alterSpecification (',' alterSpecification)*)?
     ;
-
-// details
 
 alterSpecification
-    : tableOption (','? tableOption)*
+    : tableOption                                                   #alterTableOption
+    | ADD indexColumnDefinition                                     #alterAddIndex
+    | ALTER INDEX indexName=uid THROUGHPUT '='? '(' 
+        readCapacity=decimalLiteral ',' 
+        writeCapacity=decimalLiteral ')'                            #alterIndexThroughput
+    | DROP INDEX indexName=uid                                      #alterDropIndex
     ;
-
-
-//    Drop statements
 
 dropIndex
-    : DROP INDEX uid ON tableName
+    : DROP INDEX indexName=uid ON tableName
     ;
-
+    
 dropTable
-    : DROP TABLE tableName
+    : DROP TABLE ifExists? tableName (',' tableName)* 
     ;
 
-//    Other DDL statements
-
-truncateTable
-    : TRUNCATE TABLE? tableName
-    ;
-
-
-// Data Manipulation Language
-
-//    Primary DML Statements
-
-deleteStatement
-    : singleDeleteStatement | multipleDeleteStatement
-    ;
+// dml statement
 
 insertStatement
-    : INSERT INTO tableName
-      (PARTITION '(' partitions=uidList? ')' )?
-      (
+    : INSERT IGNORE? INTO? tableName
         ('(' columns=uidList ')')? insertStatementValue
-        | SET
-            setFirst=updatedElement
-            (',' setElements+=updatedElement)*
-      )
     ;
 
 selectStatement
-    : querySpecification                                            #simpleSelect
+    : querySpecification                                    #simpleSelect
+    | queryExpression                                       #parenthesisSelect
     ;
-
-updateStatement
-    : singleUpdateStatement | multipleUpdateStatement
-    ;
-
-// details
 
 insertStatementValue
-    : insertFormat=(VALUES | VALUE)
+    : selectStatement
+    | insertFormat=(VALUES | VALUE)
       '(' expressionsWithDefaults? ')'
         (',' '(' expressionsWithDefaults? ')')*
     ;
 
-updatedElement
-    : uid '=' (expression)
-    ;
-
-//    Detailed DML Statements
-
-singleDeleteStatement
-    : DELETE FROM tableName
-      (PARTITION '(' uidList ')' )?
-      (WHERE expression)?
-      orderByClause? (LIMIT limitClauseAtom)?
-    ;
-
-multipleDeleteStatement
-    : DELETE 
-      (
-        tableName ('.' '*')? ( ',' tableName ('.' '*')? )*
-            FROM tableSources
-        | FROM
-            tableName ('.' '*')? ( ',' tableName ('.' '*')? )*
-            USING tableSources
-      )
-      (WHERE expression)?
-    ;
-
-singleUpdateStatement
-    : UPDATE tableName (AS? uid)?
-      SET updatedElement (',' updatedElement)*
-      (WHERE expression)? orderByClause? limitClause?
-    ;
-
-multipleUpdateStatement
-    : UPDATE tableSources
-      SET updatedElement (',' updatedElement)*
-      (WHERE expression)?
-    ;
-
-// details
-
-orderByClause
+orderClause
     : ORDER order=(ASC | DESC)
     ;
 
-tableSources
-    : tableSource (',' tableSource)*
-    ;
-
 tableSource
-    : tableSourceItem                                               #tableSourceBase
-    | '(' tableSourceItem           ')'                             #tableSourceNested
+    : tableSourceItem                                       #tableSourceBase
+    | '(' tableSourceItem ')'                               #tableSourceNested
     ;
 
 tableSourceItem
-    : tableName
-      (PARTITION '(' uidList ')' )? (AS? alias=uid)?                #atomTableItem
-    | '(' tableSources ')'                                          #tableSourcesItem
+    : tableName (AS? alias=uid)?                                    #atomTableItem
+    | '(' parenthesisSubquery=selectStatement ')' (AS? alias=uid)?  #subqueryTableItem
     ;
 
-//    Select Statement's Details
+// Select Statement
 
 queryExpression
     : '(' querySpecification ')'
@@ -201,50 +155,105 @@ queryExpression
     ;
 
 querySpecification
-    : SELECT selectElements
-      fromClause? orderByClause? limitClause?
+    : SELECT selectSpec? selectElements
+      fromClause? orderClause? limitClause? offsetClause? startKeyClause?
     ;
 
-// details
-
+selectSpec
+    : STRONGLY
+    | EVENTUALLY
+    ;
+    
 selectElements
-    : (star='*' | selectElement ) (',' selectElement)*
+    : (star='*' | selectElement)* (',' selectElement)*
     ;
-
+    
 selectElement
-    : uid (AS? alias=uid)?
+    : fullColumnName (AS? alias=uid)?                       #selectColumnElement
+    | functionCall (AS? alias=uid)?                         #selectFunctionElement
     ;
-
+    
 fromClause
-    : FROM tableSources
+    : FROM tableSource
       (WHERE whereExpr=expression)?
+//      (
+//        GROUP BY
+//        groupByItem (',' groupByItem)*
+//        (WITH ROLLUP)?
+//      )?
+//      (HAVING havingExpr=expression)?
     ;
 
 limitClause
-    : LIMIT limit=limitClauseAtom
+    : LIMIT limit=decimalLiteral
     ;
 
-limitClauseAtom
-    : decimalLiteral
+offsetClause
+    : OFFSET offset=decimalLiteral
     ;
 
-// Administration Statements
-//    show statements
+startKeyClause
+    : START KEY '(' hashKey=constant (',' sortKey=constant)? ')'
+    ;
+
+// update statements
+
+updatedElement
+    : fullColumnName '=' (expression | DEFAULT)
+    ;
+
+updateStatement
+    : UPDATE tableName
+        SET updatedElement (',' updatedElement)*
+        (WHERE expression)? limitClause?
+    ;
+
+// delete statements
+
+deleteStatement
+    : DELETE FROM tableName
+        (WHERE expression)? limitClause?
+    ;
+
+// describe statements
+
+describeStatement
+    : (DESCRIBE | DESC) describeSpecification
+    ;
+
+describeSpecification
+    : TABLE tableName                                      #describeTable
+    | LIMITS                                               #describeLimits
+    | ENDPOINTS                                            #describeEndPoints
+    ;
+
+// show statements
 
 showStatement
-    : SHOW columnsFormat=(COLUMNS | FIELDS)
-      tableFormat=(FROM | IN) tableName                             #showColumns
-    | SHOW indexFormat=(INDEXES | KEYS)
-      tableFormat=(FROM | IN) tableName                             #showIndexes
-    | SHOW TABLES                                                   #showTables
+    : SHOW showSpecification
     ;
 
-// Common Clauses
+showSpecification
+    : TABLES                                               #showTables
+    | (INDEX | INDEXES) (FROM | IN) tableName              #showIndexes
+    ;    
 
-//    DB Objects
+fullId
+    : uid dottedId?
+    ;
 
 tableName
-    : uid
+    : fullId
+    ;
+
+fullColumnName
+    : uid (dottedId dottedId? )?
+    ;
+
+// DB Objects
+
+columnName
+    : (uid | STRING_LITERAL)
     ;
 
 uid
@@ -255,7 +264,12 @@ uid
 
 simpleId
     : ID
+    | STRING_LITERAL
     | keywordsCanBeId
+    ;
+
+dottedId
+    : '.' uid
     ;
 
 //    Literals
@@ -265,7 +279,9 @@ decimalLiteral
     ;
 
 stringLiteral
-    : STRING_LITERAL+
+    : (
+        STRING_LITERAL
+      ) STRING_LITERAL*
     ;
 
 booleanLiteral
@@ -292,6 +308,15 @@ constant
     | nullNotnull                                                   #nullLiteralConstant
     ;
 
+//    Common Lists
+
+uidList
+    : uid (',' uid)*
+    ;
+
+primaryKeyColumns
+    : '(' hashKey=columnName (',' sortKey=columnName)? ')'
+    ;
 
 //    Data Types
 
@@ -299,35 +324,49 @@ dataType
     : typeName=(
       VARCHAR | TEXT | MEDIUMTEXT | LONGTEXT | STRING
       | INT | INTEGER | BIGINT | BOOL | BOOLEAN | LIST
-      | BINARY | NUMBER_LIST | STRING_LIST
+      | BINARY | NUMBER_LIST | STRING_LIST | BINARY_LIST
       )
     ;
+    
 
-//    Common Lists
+//    Functions
 
-uidList
-    : uid (',' uid)*
+functionCall
+    : updateItemFunction                                            #updateItemFunctionCall
+    | conditionExpressionFunction                                   #conditionExpressionFunctionCall
+    ;
+
+updateItemFunction
+    : IF_NOT_EXISTS '(' dottedId separator=',' constant ')'         #ifNotExistsFunctionCall
+    ;
+
+conditionExpressionFunction
+    : ATTRIBUTE_EXISTS '(' dottedId ')'                             #attributeExistsFunctionCall
+    | ATTRIBUTE_NOT_EXISTS '(' dottedId ')'                         #attributeNotExistsFunctionCall
+    | ATTRIBUTE_TYPE '(' dottedId separator=',' dataType ')'        #attributeTypeFunctionCall
+    | BEGINS_WITH '(' dottedId separator=',' stringLiteral ')'      #beginsWithFunctionCall
+    | CONTAINS '(' dottedId separator=',' stringLiteral ')'         #beginsWithFunctionCall
+    | SIZE '(' dottedId ')'                                         #beginsWithFunctionCall
+    ;
+    
+ifExists
+    : IF EXISTS;
+    
+ifNotExists
+    : IF NOT EXISTS;
+
+expressionsWithDefaults
+    : expressionOrDefault (',' expressionOrDefault)*
     ;
 
 expressions
     : expression (',' expression)*
     ;
 
-expressionsWithDefaults
-    : expressionOrDefault (',' expressionOrDefault)*
-    ;
-
-//    Common Expressons
-
 expressionOrDefault
     : expression | DEFAULT
     ;
 
-ifNotExists
-    : IF NOT EXISTS;
-
-//    Expressions, predicates
-// Simplified approach for expression
 expression
     : notOperator=(NOT | '!') expression                            #notExpression
     | left=expression logicalOperator right=expression              #logicalExpression
@@ -335,36 +374,143 @@ expression
     ;
 
 predicate
-    : predicate NOT? IN '(' (expressions) ')'     #inPredicate
+    : predicate NOT? IN '(' (selectStatement | expressions) ')'     #inPredicate
     | predicate IS nullNotnull                                      #isNullPredicate
     | left=predicate comparisonOperator right=predicate             #binaryComparasionPredicate
+    | predicate comparisonOperator
+      quantifier=(ALL | ANY | SOME) '(' selectStatement ')'         #subqueryComparasionPredicate
     | predicate NOT? BETWEEN predicate AND predicate                #betweenPredicate
+    | left=predicate SOUNDS LIKE right=predicate                    #soundsLikePredicate
+    | left=predicate NOT? LIKE right=predicate
+      (ESCAPE STRING_LITERAL)?                                      #likePredicate
+    | left=predicate NOT? regex=(REGEXP | RLIKE) right=predicate    #regexpPredicate
     | expressionAtom                                                #expressionAtomPredicate
     ;
 
-// Add in ASTVisitor nullNotnull in constant
 expressionAtom
     : constant                                                      #constantExpressionAtom
-    | BINARY expressionAtom                                         #binaryExpressionAtom
+    | fullColumnName                                                #fullColumnNameExpressionAtom
+    | functionCall                                                  #functionCallExpressionAtom
+    | '(' expression (',' expression)* ')'                          #nestedExpressionAtom
+    | ROW '(' expression (',' expression)+ ')'                      #nestedRowExpressionAtom
+    | EXISTS '(' selectStatement ')'                                #existsExpessionAtom
+    | '(' selectStatement ')'                                       #subqueryExpessionAtom
     | left=expressionAtom bitOperator right=expressionAtom          #bitExpressionAtom
+    | left=expressionAtom mathOperator right=expressionAtom         #mathExpressionAtom
     ;
 
 comparisonOperator
     : '=' | '>' | '<' | '<' '=' | '>' '='
-    | '<' '>' | '!' '=' // Alias <>
+    | '<' '>' | '!' '=' | '<' '=' '>'
     ;
 
 logicalOperator
-    : AND | '&' '&' | OR | '|' '|'
+    : AND | '&' '&' | XOR | OR | '|' '|'
     ;
 
 bitOperator
     : '<' '<' | '>' '>' | '&' | '^' | '|'
     ;
 
+mathOperator
+    : '*' | '/' | '%' | DIV | MOD | '+' | '-' | '--'
+    ;
+
+
 keywordsCanBeId
-    : COLUMNS | FIELDS | HASH | INDEXES | LIST
-    | SERIAL | STRING
-    | TRUNCATE | VALUE | TEXT 
-    | TABLES | IN
+    : SELECT
+    | STRONGLY
+    | EVENTUALLY
+    | AS
+    | FROM
+    | WHERE
+    | GROUP
+    | BY
+    | WITH
+    | ROLLUP
+    | HAVING
+    | LIMIT
+    | LIMITS
+    | OFFSET
+    | TRUE
+    | FALSE
+    | VARCHAR
+    | TEXT
+    | MEDIUMTEXT
+    | LONGTEXT
+    | STRING
+    | INT
+    | INTEGER
+    | BIGINT
+    | BOOL
+    | BOOLEAN
+    | LIST
+    | BINARY
+    | NUMBER_LIST
+    | STRING_LIST
+    | BINARY_LIST
+    | ORDER
+    | CREATE
+    | INDEX
+    | INDEXES
+    | ON
+    | LOCAL
+    | GLOBAL
+    | ALL
+    | KEYS
+    | ONLY
+    | INCLUDE
+    | TABLE
+    | TABLES
+    | HASH
+    | KEY
+    | RANGE
+    | THROUGHPUT
+    | BILLINGMODE
+    | PROVISIONED
+    | PAY_PER_REQUEST
+    | ON_DEMAND
+    | ALTER
+    | ADD
+    | DROP
+    | INSERT
+    | IGNORE
+    | INTO
+    | VALUES
+    | VALUE
+    | ASC
+    | DESC
+    | DESCRIBE
+    | NULL_LITERAL
+    | NOT
+    | IF_NOT_EXISTS
+    | ATTRIBUTE_EXISTS
+    | ATTRIBUTE_NOT_EXISTS
+    | ATTRIBUTE_TYPE
+    | BEGINS_WITH
+    | CONTAINS
+    | SIZE
+    | IF
+    | EXISTS
+    | DEFAULT
+    | BETWEEN
+    | AND
+    | SOUNDS
+    | LIKE
+    | REGEXP
+    | RLIKE
+    | IN
+    | IS
+    | ANY
+    | SOME
+    | ESCAPE
+    | ROW
+    | XOR
+    | OR
+    | START
+    | ENDPOINTS
+    | SHOW
+    | DELETE
+    | UPDATE
+    | SET
     ;
