@@ -54,14 +54,15 @@ namespace PrimarSql.Sample
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Terminal: {terminalNode.GetText()}");
             }
-            else if (v is INode node)
+            else if (v is ITree tree)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine(v.GetType().Name);
+                Console.WriteLine(v.GetType().Name[..^7]);
 
-                foreach (var n in node.Children)
+                for (int index = 0; index < tree.ChildCount; index++)
                 {
-                    Print(n, depth + 1);
+                    var c = tree.GetChild(index);
+                    Print(c, depth + 1);
                 }
             }
         }

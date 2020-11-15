@@ -5,7 +5,7 @@ namespace PrimarSql
 {
     public sealed class PrimarSqlParser
     {
-        public static IRootNode Parse(string sql)
+        public static Internal.PrimarSqlParser.RootContext Parse(string sql)
         {
             var stream = new AntlrUpperInputStream(sql);
             var lexer = new PrimarSqlLexer(stream);
