@@ -107,6 +107,8 @@ SHOW:                                'SHOW';
 UPDATE:                              'UPDATE';
 SET:                                 'SET';
 DELETE:                              'DELETE';
+PARTITION:                           'PARTITION';
+SORT:                                'SORT';
 
 
 // Operators. Arithmetics

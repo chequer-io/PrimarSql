@@ -71,13 +71,13 @@ columnDefinition
     ;
 
 columnConstraint
-    : HASH KEY                                                      #hashKeyColumnConstraint
-    | RANGE KEY                                                     #rangeKeyColumnConstraint
+    : (HASH | PARTITION) KEY                                        #hashKeyColumnConstraint
+    | (RANGE | SORT) KEY                                            #rangeKeyColumnConstraint
     ;
 
 tableConstraint
-    : HASH KEY index=uid?                                           #hashKeyTableConstraint
-    | RANGE KEY index=uid?                                          #rangeKeyTableConstraint
+    : (HASH | PARTITION) KEY index=uid?                             #hashKeyTableConstraint
+    | (RANGE | SORT) KEY index=uid?                                 #rangeKeyTableConstraint
     ;
 
 indexColumnDefinition
