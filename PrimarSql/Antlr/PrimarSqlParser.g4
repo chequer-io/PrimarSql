@@ -177,12 +177,6 @@ selectElement
 fromClause
     : FROM tableSource
       (WHERE whereExpr=expression)?
-//      (
-//        GROUP BY
-//        groupByItem (',' groupByItem)*
-//        (WITH ROLLUP)?
-//      )?
-//      (HAVING havingExpr=expression)?
     ;
 
 limitClause
