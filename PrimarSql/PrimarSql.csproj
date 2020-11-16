@@ -2,10 +2,25 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
+        <RootNamespace>PrimarSql</RootNamespace>
     </PropertyGroup>
 
+    <PropertyGroup Label="Nuspec">
+        <Title>PrimarSQL</Title>
+        <Description>.NET Core SQL parser for DynamoDB</Description>
+        <Authors>CHEQUER</Authors>
+        <Company>CHEQUER</Company>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <RepositoryUrl>https://github.com/chequer-io/PrimarSql</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/chequer-io/PrimarSql</PackageProjectUrl>
+        <Version>1.0.0</Version>
+        <PackageTags>sql;primarsql;dynamodb;nosql;parser</PackageTags>
+    </PropertyGroup>
+    
     <ItemGroup>
-      <PackageReference Include="Antlr4.Runtime.Standard" Version="4.8.0" />
+        <PackageReference Include="Antlr4.Runtime.Standard" Version="4.8.0" />
+
+        <None Include="..\LICENSE" PackagePath="" Pack="True" />
     </ItemGroup>
 
 </Project>
