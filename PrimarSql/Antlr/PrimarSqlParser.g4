@@ -4,22 +4,9 @@ options {
     tokenVocab=PrimarSqlLexer;
 }
 
-root
-    : sqlStatements? MINUSMINUS? EOF
-    ;
-
-sqlStatements
-    : (sqlStatement MINUSMINUS? SEMI? | emptyStatement)*
-    (sqlStatement (MINUSMINUS? SEMI)? | emptyStatement)
-    ;
-
 sqlStatement
     : ddlStatement | dmlStatement
     | describeStatement | showStatement
-    ;
-
-emptyStatement
-    : SEMI
     ;
 
 ddlStatement
