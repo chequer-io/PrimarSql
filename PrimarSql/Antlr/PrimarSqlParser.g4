@@ -170,9 +170,10 @@ selectElements
     
 selectElement
     : fullColumnName (AS? alias=uid)?                       #selectColumnElement
-    | functionCall (AS? alias=uid)?                         #selectFunctionElement
+    | builtInFunctionCall (AS? alias=uid)?                  #selectFunctionElement
+    | expression (AS? alias=uid)?                           #selectExpressionElement
     ;
-    
+
 fromClause
     : FROM tableSource
       (WHERE whereExpr=expression)?
@@ -265,7 +266,6 @@ uid
 simpleId
     : ID
     | STRING_LITERAL
-    | keywordsCanBeId
     ;
 
 dottedId
@@ -329,26 +329,6 @@ dataType
     ;
     
 
-//    Functions
-
-functionCall
-    : updateItemFunction                                            #updateItemFunctionCall
-    | conditionExpressionFunction                                   #conditionExpressionFunctionCall
-    ;
-
-updateItemFunction
-    : IF_NOT_EXISTS '(' dottedId separator=',' constant ')'         #ifNotExistsFunctionCall
-    ;
-
-conditionExpressionFunction
-    : ATTRIBUTE_EXISTS '(' dottedId ')'                             #attributeExistsFunctionCall
-    | ATTRIBUTE_NOT_EXISTS '(' dottedId ')'                         #attributeNotExistsFunctionCall
-    | ATTRIBUTE_TYPE '(' dottedId separator=',' dataType ')'        #attributeTypeFunctionCall
-    | BEGINS_WITH '(' dottedId separator=',' stringLiteral ')'      #beginsWithFunctionCall
-    | CONTAINS '(' dottedId separator=',' stringLiteral ')'         #beginsWithFunctionCall
-    | SIZE '(' dottedId ')'                                         #beginsWithFunctionCall
-    ;
-    
 ifExists
     : IF EXISTS;
     
@@ -399,6 +379,79 @@ expressionAtom
     | left=expressionAtom mathOperator right=expressionAtom         #mathExpressionAtom
     ;
 
+//    Functions
+
+functionCall
+    : builtInFunctionCall
+    | nativeFunctionCall
+    ; 
+
+builtInFunctionCall
+    : ( CURRENT_DATE | CURRENT_TIME | CURRENT_TIMESTAMP )           #timeFunctionCall
+    | CAST '(' expression AS dataType ')'                           #castFunctionCall
+    | (SUBSTR | SUBSTRING)
+        '('
+            (
+                sourceString=stringLiteral
+                | sourceExpression=expression
+            ) FROM
+            (
+                fromDecimal=decimalLiteral
+                | fromExpression=expression
+            )
+            (
+                FOR
+                (
+                    forDecimal=decimalLiteral
+                    | forExpression=expression
+                )
+            )?
+        ')'                                                          #substrFunctionCall
+    | TRIM
+        '('
+            positioinForm=(BOTH | LEADING | TRAILING)
+            (
+                sourceString=stringLiteral
+                | sourceExpression=expression
+            )?
+            FROM
+            (
+                fromString=stringLiteral
+                | fromExpression=expression
+            )
+        ')'                                                           #trimFunctionCall
+    | TRIM
+        '('
+            (
+                sourceString=stringLiteral
+                | sourceExpression=expression
+            )
+            FROM
+            (
+                fromString=stringLiteral
+                | fromExpression=expression
+            )
+        ')'                                                           #trimFunctionCall
+    ;
+
+nativeFunctionCall
+    : updateItemFunction                                            #updateItemFunctionCall
+    | conditionExpressionFunction                                   #conditionExpressionFunctionCall
+    ;
+
+updateItemFunction
+    : IF_NOT_EXISTS '(' fullId separator=',' constant ')'         #ifNotExistsFunctionCall
+    ;
+
+conditionExpressionFunction
+    : ATTRIBUTE_EXISTS '(' fullId ')'                             #attributeExistsFunctionCall
+    | ATTRIBUTE_NOT_EXISTS '(' fullId ')'                         #attributeNotExistsFunctionCall
+    | ATTRIBUTE_TYPE '(' fullId separator=',' dataType ')'        #attributeTypeFunctionCall
+    | BEGINS_WITH '(' fullId separator=',' stringLiteral ')'      #beginsWithFunctionCall
+    | CONTAINS '(' fullId separator=',' stringLiteral ')'         #beginsWithFunctionCall
+    | SIZE '(' fullId ')'                                         #beginsWithFunctionCall
+    ;
+    
 comparisonOperator
     : '=' | '>' | '<' | '<' '=' | '>' '='
     | '<' '>' | '!' '=' | '<' '=' '>'
@@ -414,103 +467,4 @@ bitOperator
 
 mathOperator
     : '*' | '/' | '%' | DIV | MOD | '+' | '-' | '--'
-    ;
-
-
-keywordsCanBeId
-    : SELECT
-    | STRONGLY
-    | EVENTUALLY
-    | AS
-    | FROM
-    | WHERE
-    | GROUP
-    | BY
-    | WITH
-    | ROLLUP
-    | HAVING
-    | LIMIT
-    | LIMITS
-    | OFFSET
-    | TRUE
-    | FALSE
-    | VARCHAR
-    | TEXT
-    | MEDIUMTEXT
-    | LONGTEXT
-    | STRING
-    | INT
-    | INTEGER
-    | BIGINT
-    | BOOL
-    | BOOLEAN
-    | LIST
-    | BINARY
-    | NUMBER_LIST
-    | STRING_LIST
-    | BINARY_LIST
-    | ORDER
-    | CREATE
-    | INDEX
-    | INDEXES
-    | ON
-    | LOCAL
-    | GLOBAL
-    | ALL
-    | KEYS
-    | ONLY
-    | INCLUDE
-    | TABLE
-    | TABLES
-    | HASH
-    | KEY
-    | RANGE
-    | THROUGHPUT
-    | BILLINGMODE
-    | PROVISIONED
-    | PAY_PER_REQUEST
-    | ON_DEMAND
-    | ALTER
-    | ADD
-    | DROP
-    | INSERT
-    | IGNORE
-    | INTO
-    | VALUES
-    | VALUE
-    | ASC
-    | DESC
-    | DESCRIBE
-    | NULL_LITERAL
-    | NOT
-    | IF_NOT_EXISTS
-    | ATTRIBUTE_EXISTS
-    | ATTRIBUTE_NOT_EXISTS
-    | ATTRIBUTE_TYPE
-    | BEGINS_WITH
-    | CONTAINS
-    | SIZE
-    | IF
-    | EXISTS
-    | DEFAULT
-    | BETWEEN
-    | AND
-    | SOUNDS
-    | LIKE
-    | REGEXP
-    | RLIKE
-    | IN
-    | IS
-    | ANY
-    | SOME
-    | ESCAPE
-    | ROW
-    | XOR
-    | OR
-    | START
-    | ENDPOINTS
-    | SHOW
-    | DELETE
-    | UPDATE
-    | SET
     ;

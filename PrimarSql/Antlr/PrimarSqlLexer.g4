@@ -21,8 +21,6 @@ WHERE:                               'WHERE';
 GROUP:                               'GROUP';
 BY:                                  'BY';
 WITH:                                'WITH';
-ROLLUP:                              'ROLLUP';
-HAVING:                              'HAVING';
 LIMIT:                               'LIMIT';
 LIMITS:                              'LIMITS';
 OFFSET:                              'OFFSET';
@@ -109,7 +107,17 @@ SET:                                 'SET';
 DELETE:                              'DELETE';
 PARTITION:                           'PARTITION';
 SORT:                                'SORT';
-
+CURRENT_DATE:                        'CURRENT_DATE';
+CURRENT_TIME:                        'CURRENT_TIME';
+CURRENT_TIMESTAMP:                   'CURRENT_TIMESTAMP';
+CAST:                                'CAST';
+SUBSTR:                              'SUBSTR';
+SUBSTRING:                           'SUBSTRING';
+TRIM:                                'TRIM';
+BOTH:                                'BOTH';
+LEADING:                             'LEADING';
+TRAILING:                            'TRAILING';
+FOR:                                 'FOR';
 
 // Operators. Arithmetics
 
