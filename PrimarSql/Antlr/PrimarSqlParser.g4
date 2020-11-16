@@ -165,7 +165,7 @@ selectSpec
     ;
     
 selectElements
-    : (star='*' | selectElement)* (',' selectElement)*
+    : (star='*' | selectElement) (',' selectElement)*
     ;
     
 selectElement
