@@ -354,8 +354,8 @@ expressionAtom
     | functionCall                                                  #functionCallExpressionAtom
     | '(' expression (',' expression)* ')'                          #nestedExpressionAtom
     | ROW '(' expression (',' expression)+ ')'                      #nestedRowExpressionAtom
-    | EXISTS '(' selectStatement ')'                                #existsExpessionAtom
-    | '(' selectStatement ')'                                       #subqueryExpessionAtom
+    | EXISTS '(' selectStatement ')'                                #existsExpressionAtom
+    | '(' selectStatement ')'                                       #subqueryExpressionAtom
     | left=expressionAtom bitOperator right=expressionAtom          #bitExpressionAtom
     | left=expressionAtom mathOperator right=expressionAtom         #mathExpressionAtom
     ;
