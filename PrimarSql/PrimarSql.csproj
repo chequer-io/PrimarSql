@@ -13,13 +13,15 @@
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <RepositoryUrl>https://github.com/chequer-io/PrimarSql</RepositoryUrl>
         <PackageProjectUrl>https://github.com/chequer-io/PrimarSql</PackageProjectUrl>
-        <Version>1.0.2</Version>
+        <Version>1.0.3</Version>
+        <PackageIcon>Logo.png</PackageIcon>
         <PackageTags>sql;primarsql;dynamodb;nosql;parser</PackageTags>
     </PropertyGroup>
     
     <ItemGroup>
         <PackageReference Include="Antlr4.Runtime.Standard" Version="4.8.0" />
 
+        <None Include="..\Logo.png" PackagePath="" Pack="True" />
         <None Include="..\LICENSE" PackagePath="" Pack="True" />
     </ItemGroup>
 
