@@ -3,7 +3,7 @@ using PrimarSql.Internal;
 
 namespace PrimarSql
 {
-    public sealed class PrimarSqlParser
+    public static class PrimarSqlParser
     {
         public static Internal.PrimarSqlParser.RootContext Parse(string sql)
         {
