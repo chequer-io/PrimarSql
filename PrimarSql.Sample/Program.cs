@@ -9,7 +9,7 @@ namespace PrimarSql.Sample
 {
     class Program
     {
- private static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var defaultColor = Console.ForegroundColor;
 

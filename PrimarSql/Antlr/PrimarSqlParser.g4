@@ -4,6 +4,10 @@ options {
     tokenVocab=PrimarSqlLexer;
 }
 
+root
+    : sqlStatement SEMI? EOF
+    ;
+
 sqlStatement
     : ddlStatement | dmlStatement
     | describeStatement | showStatement

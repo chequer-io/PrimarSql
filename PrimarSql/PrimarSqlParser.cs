@@ -5,13 +5,13 @@ namespace PrimarSql
 {
     public sealed class PrimarSqlParser
     {
-        public static Internal.PrimarSqlParser.SqlStatementContext Parse(string sql)
+        public static Internal.PrimarSqlParser.RootContext Parse(string sql)
         {
             var stream = new AntlrUpperInputStream(sql);
             var lexer = new PrimarSqlLexer(stream);
             var tokens = new CommonTokenStream(lexer);
 
-            return (new Internal.PrimarSqlParser(tokens)).sqlStatement();
+            return new Internal.PrimarSqlParser(tokens).root();
         }
     }
 }
