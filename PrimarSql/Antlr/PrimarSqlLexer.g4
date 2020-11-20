@@ -73,7 +73,6 @@ VALUE:                               'VALUE';
 ASC:                                 'ASC';
 DESC:                                'DESC';
 DESCRIBE:                            'DESCRIBE';
-NULL_LITERAL:                        'NULL_LITERAL';
 NOT:                                 'NOT';
 IF_NOT_EXISTS:                       'IF_NOT_EXISTS';
 ATTRIBUTE_EXISTS:                    'ATTRIBUTE_EXISTS';
@@ -118,6 +117,8 @@ BOTH:                                'BOTH';
 LEADING:                             'LEADING';
 TRAILING:                            'TRAILING';
 FOR:                                 'FOR';
+
+NULL_LITERAL:                        'NULL';
 
 // Operators. Arithmetics
 
@@ -172,7 +173,6 @@ REAL_LITERAL:                        (DEC_DIGIT+)? '.' DEC_DIGIT+
                                      | DEC_DIGIT+ '.' EXPONENT_NUM_PART
                                      | (DEC_DIGIT+)? '.' (DEC_DIGIT+ EXPONENT_NUM_PART)
                                      | DEC_DIGIT+ EXPONENT_NUM_PART;
-NULL_SPEC_LITERAL:                   '\\' 'N';
 BIT_STRING:                          BIT_STRING_L;
 
 // Identifiers

@@ -276,7 +276,7 @@ hexadecimalLiteral
     : HEXADECIMAL_LITERAL;
 
 nullLiteral
-    : NULL_LITERAL | NULL_SPEC_LITERAL;
+    : NULL_LITERAL;
 
 nullNotnull
     : NOT? nullLiteral
