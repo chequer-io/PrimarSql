@@ -10,8 +10,11 @@ namespace PrimarSql
             var stream = new AntlrUpperInputStream(sql);
             var lexer = new PrimarSqlLexer(stream);
             var tokens = new CommonTokenStream(lexer);
-
-            return new Internal.PrimarSqlParser(tokens).root();
+            var parser = new Internal.PrimarSqlParser(tokens);
+            
+            parser.AddErrorListener(new AntlrErrorHandler());
+            
+            return parser.root();
         }
     }
 }
