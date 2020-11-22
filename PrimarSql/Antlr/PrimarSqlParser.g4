@@ -224,6 +224,10 @@ showSpecification
     | (INDEX | INDEXES) (FROM | IN) tableName              #showIndexes
     ;    
 
+columnIndex
+    : '[' decimalLiteral ']'
+    ;
+
 fullId
     : uid dottedId?
     ;
@@ -233,7 +237,12 @@ tableName
     ;
 
 fullColumnName
-    : uid (dottedId dottedId? )?
+    : uid columnDottedId*
+    ;
+
+columnDottedId
+    : columnIndex 
+    | dottedId
     ;
 
 // DB Objects

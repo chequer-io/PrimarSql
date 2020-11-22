@@ -149,6 +149,8 @@ BIT_XOR_OP:                          '^';
 DOT:                                 '.';
 LR_BRACKET:                          '(';
 RR_BRACKET:                          ')';
+L_BRACKET:                           '[';
+R_BRACKET:                           ']';
 COMMA:                               ',';
 SEMI:                                ';';
 AT_SIGN:                             '@';
