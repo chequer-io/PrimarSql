@@ -156,7 +156,7 @@ selectSpec
     ;
     
 selectElements
-    : (star='*' | selectElement) (',' selectElement)*
+    : (star='*' | selectElement (',' selectElement)*)
     ;
     
 selectElement
@@ -342,10 +342,7 @@ predicate
     : predicate NOT? IN '(' (selectStatement | expressions) ')'     #inPredicate
     | predicate IS nullNotnull                                      #isNullPredicate
     | left=predicate comparisonOperator right=predicate             #binaryComparasionPredicate
-    | predicate comparisonOperator
-      quantifier=(ALL | ANY | SOME) '(' selectStatement ')'         #subqueryComparasionPredicate
     | predicate NOT? BETWEEN predicate AND predicate                #betweenPredicate
-    | left=predicate SOUNDS LIKE right=predicate                    #soundsLikePredicate
     | left=predicate NOT? LIKE right=predicate
       (ESCAPE STRING_LITERAL)?                                      #likePredicate
     | left=predicate NOT? regex=(REGEXP | RLIKE) right=predicate    #regexpPredicate
@@ -357,7 +354,6 @@ expressionAtom
     | fullColumnName                                                #fullColumnNameExpressionAtom
     | functionCall                                                  #functionCallExpressionAtom
     | '(' expression (',' expression)* ')'                          #nestedExpressionAtom
-    | ROW '(' expression (',' expression)+ ')'                      #nestedRowExpressionAtom
     | EXISTS '(' selectStatement ')'                                #existsExpressionAtom
     | '(' selectStatement ')'                                       #subqueryExpressionAtom
     | left=expressionAtom bitOperator right=expressionAtom          #bitExpressionAtom
