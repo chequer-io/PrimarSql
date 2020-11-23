@@ -27,7 +27,7 @@ dmlStatement
 
 createIndex
     : CREATE indexSpec? INDEX uid
-    ON tableName primaryKeyColumns
+    ON tableName primaryKeyColumnsWithType
     indexOption?
     ;
 
@@ -310,6 +310,10 @@ constant
 
 uidList
     : uid (',' uid)*
+    ;
+
+primaryKeyColumnsWithType
+    : '(' hashKey=columnName hashKeyType=dataType (',' sortKey=columnName sortKeyType=dataType)? ')'
     ;
 
 primaryKeyColumns
