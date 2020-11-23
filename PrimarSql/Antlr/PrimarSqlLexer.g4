@@ -115,6 +115,7 @@ BOTH:                                'BOTH';
 LEADING:                             'LEADING';
 TRAILING:                            'TRAILING';
 FOR:                                 'FOR';
+COLUMN:                              'COLUMN';
 
 NULL_LITERAL:                        'NULL';
 

@@ -89,6 +89,11 @@ alterTable
 
 alterSpecification
     : tableOption                                                   #alterTableOption
+    | ADD COLUMN? uid dataType                                      #alterByAddColumn
+    | ADD COLUMN?
+        '('
+          uid dataType ( ',' uid dataType)*
+        ')'                                                         #alterByAddColumns
     | ADD indexColumnDefinition                                     #alterAddIndex
     | ALTER INDEX indexName=uid THROUGHPUT '='? '(' 
         readCapacity=decimalLiteral ',' 
@@ -99,7 +104,7 @@ alterSpecification
 dropIndex
     : DROP INDEX indexName=uid ON tableName
     ;
-    
+
 dropTable
     : DROP TABLE ifExists? tableName (',' tableName)* 
     ;
@@ -153,11 +158,11 @@ selectSpec
     : STRONGLY
     | EVENTUALLY
     ;
-    
+
 selectElements
     : (star='*' | selectElement (',' selectElement)*)
     ;
-    
+
 selectElement
     : fullColumnName (AS? alias=uid)?                       #selectColumnElement
     | builtInFunctionCall (AS? alias=uid)?                  #selectFunctionElement
@@ -221,7 +226,7 @@ showStatement
 showSpecification
     : TABLES                                               #showTables
     | (INDEX | INDEXES) (FROM | IN) tableName              #showIndexes
-    ;    
+    ;
 
 columnIndex
     : '[' decimalLiteral ']'
@@ -320,11 +325,10 @@ dataType
       | BINARY | NUMBER_LIST | STRING_LIST | BINARY_LIST
       )
     ;
-    
 
 ifExists
     : IF EXISTS;
-    
+
 ifNotExists
     : IF NOT EXISTS;
 
@@ -440,7 +444,7 @@ conditionExpressionFunction
     | CONTAINS '(' fullId separator=',' stringLiteral ')'         #beginsWithFunctionCall
     | SIZE '(' fullId ')'                                         #beginsWithFunctionCall
     ;
-    
+
 comparisonOperator
     : '=' | '>' | '<' | '<' '=' | '>' '='
     | '<' '>' | '!' '=' | '<' '=' '>'
