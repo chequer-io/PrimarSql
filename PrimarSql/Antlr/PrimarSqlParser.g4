@@ -58,7 +58,7 @@ createDefinition
     ;
 
 columnDefinition
-    : dataType columnConstraint*
+    : dataType columnConstraint?
     ;
 
 columnConstraint
@@ -67,12 +67,11 @@ columnConstraint
     ;
 
 tableConstraint
-    : (HASH | PARTITION) KEY index=uid?                             #hashKeyTableConstraint
-    | (RANGE | SORT) KEY index=uid?                                 #rangeKeyTableConstraint
+    : columnConstraint index=uid?
     ;
 
 indexColumnDefinition
-    : indexType=(LOCAL | GLOBAL)? INDEX 
+    : indexSpec? INDEX 
         uid primaryKeyColumns indexOption?
     ;
 
