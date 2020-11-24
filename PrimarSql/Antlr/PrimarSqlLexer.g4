@@ -116,6 +116,7 @@ LEADING:                             'LEADING';
 TRAILING:                            'TRAILING';
 FOR:                                 'FOR';
 COLUMN:                              'COLUMN';
+OBJECT:                              'OBJECT';
 
 NULL_LITERAL:                        'NULL';
 

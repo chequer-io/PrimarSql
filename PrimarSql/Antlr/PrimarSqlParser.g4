@@ -325,8 +325,15 @@ primaryKeyColumns
 dataType
     : typeName=(
       VARCHAR | TEXT | MEDIUMTEXT | LONGTEXT | STRING
-      | INT | INTEGER | BIGINT | BOOL | BOOLEAN | LIST
-      | BINARY | NUMBER_LIST | STRING_LIST | BINARY_LIST
+      | INT | INTEGER | BIGINT 
+      | BOOL | BOOLEAN
+      | BINARY 
+      | LIST
+      | NUMBER_LIST 
+      | STRING_LIST 
+      | BINARY_LIST
+      | OBJECT
+      | NULL_LITERAL
       )
     ;
 
