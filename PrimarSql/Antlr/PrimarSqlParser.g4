@@ -303,7 +303,7 @@ constant
     | booleanLiteral                                                #booleanLiteralConstant
     | REAL_LITERAL                                                  #realLiteralConstant
     | BIT_STRING                                                    #bitStringConstant
-    | nullNotnull                                                   #nullLiteralConstant
+    | NULL_LITERAL                                                  #nullConstant
     ;
 
 //    Common Lists
