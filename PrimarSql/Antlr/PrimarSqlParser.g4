@@ -437,16 +437,16 @@ nativeFunctionCall
     ;
 
 updateItemFunction
-    : IF_NOT_EXISTS '(' fullId separator=',' constant ')'         #ifNotExistsFunctionCall
+    : IF_NOT_EXISTS '(' fullColumnName separator=',' constant ')'         #ifNotExistsFunctionCall
     ;
 
 conditionExpressionFunction
-    : ATTRIBUTE_EXISTS '(' fullId ')'                             #attributeExistsFunctionCall
-    | ATTRIBUTE_NOT_EXISTS '(' fullId ')'                         #attributeNotExistsFunctionCall
-    | ATTRIBUTE_TYPE '(' fullId separator=',' dataType ')'        #attributeTypeFunctionCall
-    | BEGINS_WITH '(' fullId separator=',' stringLiteral ')'      #beginsWithFunctionCall
-    | CONTAINS '(' fullId separator=',' stringLiteral ')'         #beginsWithFunctionCall
-    | SIZE '(' fullId ')'                                         #beginsWithFunctionCall
+    : ATTRIBUTE_EXISTS '(' fullColumnName ')'                             #attributeExistsFunctionCall
+    | ATTRIBUTE_NOT_EXISTS '(' fullColumnName ')'                         #attributeNotExistsFunctionCall
+    | ATTRIBUTE_TYPE '(' fullColumnName separator=',' dataType ')'        #attributeTypeFunctionCall
+    | BEGINS_WITH '(' fullColumnName separator=',' stringLiteral ')'      #beginsWithFunctionCall
+    | CONTAINS '(' fullColumnName separator=',' stringLiteral ')'         #containsFunctionCall
+    | SIZE '(' fullColumnName ')'                                         #sizeFunctionCall
     ;
 
 comparisonOperator
