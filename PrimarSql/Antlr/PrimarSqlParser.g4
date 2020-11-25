@@ -404,6 +404,7 @@ predicate
 expressionAtom
     : constant                                                      #constantExpressionAtom
     | JSON jsonObject                                               #jsonExpressionAtom
+    | BINARY stringLiteral                                          #binaryExpressionAtom
     | fullColumnName                                                #fullColumnNameExpressionAtom
     | functionCall                                                  #functionCallExpressionAtom
     | '(' expression (',' expression)* ')'                          #nestedExpressionAtom
