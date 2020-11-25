@@ -270,6 +270,35 @@ dottedId
     : '.' uid
     ;
 
+// JSON object
+
+jsonObject
+   : '{' jsonValuePair (',' jsonValuePair)* '}'
+   | '{' '}'
+   ;
+
+jsonValuePair
+   : stringLiteral ':' jsonValue
+   ;
+   
+jsonArray
+  : '[' jsonValue (',' jsonValue)* ']'
+  | '[' ']'
+  ;
+  
+jsonValue
+  : stringLiteral
+  | '-' REAL_LITERAL
+  | REAL_LITERAL
+  | '-' decimalLiteral
+  | decimalLiteral    
+  | jsonObject
+  | jsonArray
+  | TRUE
+  | FALSE
+  | NULL_LITERAL
+  ;
+
 //    Literals
 
 decimalLiteral
@@ -374,6 +403,7 @@ predicate
 
 expressionAtom
     : constant                                                      #constantExpressionAtom
+    | JSON jsonObject                                               #jsonExpressionAtom
     | fullColumnName                                                #fullColumnNameExpressionAtom
     | functionCall                                                  #functionCallExpressionAtom
     | '(' expression (',' expression)* ')'                          #nestedExpressionAtom

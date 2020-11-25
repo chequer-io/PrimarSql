@@ -117,6 +117,7 @@ TRAILING:                            'TRAILING';
 FOR:                                 'FOR';
 COLUMN:                              'COLUMN';
 OBJECT:                              'OBJECT';
+JSON:                                'JSON';
 
 NULL_LITERAL:                        'NULL';
 
@@ -153,6 +154,8 @@ LR_BRACKET:                          '(';
 RR_BRACKET:                          ')';
 L_BRACKET:                           '[';
 R_BRACKET:                           ']';
+JSON_L_BRACKET:                      '{';
+JSON_R_BRACKET:                      '}';
 COMMA:                               ',';
 SEMI:                                ';';
 AT_SIGN:                             '@';
