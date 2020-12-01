@@ -13,7 +13,7 @@
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <RepositoryUrl>https://github.com/chequer-io/PrimarSql</RepositoryUrl>
         <PackageProjectUrl>https://github.com/chequer-io/PrimarSql</PackageProjectUrl>
-        <Version>1.1.6</Version>
+        <Version>1.1.7</Version>
         <PackageIcon>Logo.png</PackageIcon>
         <PackageTags>sql;primarsql;dynamodb;nosql;parser</PackageTags>
     </PropertyGroup>

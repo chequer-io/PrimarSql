@@ -171,7 +171,7 @@ selectElement
 
 fromClause
     : FROM tableSource
-      (WHERE whereExpr=expression)?
+      (whereKeyword=WHERE whereExpr=expression)?
     ;
 
 limitClause
@@ -199,14 +199,14 @@ updatedElement
 updateStatement
     : UPDATE tableName
         SET updatedElement (',' updatedElement)*
-        (WHERE expression)? limitClause?
+        (whereKeyword=WHERE expression)? limitClause?
     ;
 
 // delete statements
 
 deleteStatement
     : DELETE FROM tableName
-        (WHERE expression)? limitClause?
+        (whereKeyword=WHERE expression)? limitClause?
     ;
 
 // describe statements
