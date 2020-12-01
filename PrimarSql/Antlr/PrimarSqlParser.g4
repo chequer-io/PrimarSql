@@ -151,7 +151,7 @@ queryExpression
 
 querySpecification
     : SELECT selectSpec? selectElements
-      fromClause? orderClause? limitClause? offsetClause? startKeyClause?
+      fromClause? orderClause? limitClause? startKeyClause?
     ;
 
 selectSpec
@@ -175,11 +175,15 @@ fromClause
     ;
 
 limitClause
-    : LIMIT limit=decimalLiteral
+    : LIMIT
+    (
+      (offset=limitClauseAtom ',')? limit=limitClauseAtom
+      | limit=limitClauseAtom OFFSET offset=limitClauseAtom
+    )
     ;
 
-offsetClause
-    : OFFSET offset=decimalLiteral
+limitClauseAtom
+    : decimalLiteral
     ;
 
 startKeyClause
@@ -314,9 +318,6 @@ stringLiteral
 booleanLiteral
     : TRUE | FALSE;
 
-hexadecimalLiteral
-    : HEXADECIMAL_LITERAL;
-
 nullLiteral
     : NULL_LITERAL;
 
@@ -328,7 +329,6 @@ constant
     : stringLiteral                                                 #stringLiteralConstant
     | decimalLiteral                                                #positiveDecimalLiteralConstant
     | '-' decimalLiteral                                            #negativeDecimalLiteralConstant
-    | hexadecimalLiteral                                            #hexadecimalLiteralConstant
     | booleanLiteral                                                #booleanLiteralConstant
     | REAL_LITERAL                                                  #realLiteralConstant
     | BIT_STRING                                                    #bitStringConstant
@@ -393,7 +393,7 @@ expression
 predicate
     : predicate NOT? IN '(' (selectStatement | expressions) ')'     #inPredicate
     | predicate IS nullNotnull                                      #isNullPredicate
-    | left=predicate comparisonOperator right=predicate             #binaryComparasionPredicate
+    | left=predicate comparisonOperator right=predicate             #binaryComparisonPredicate
     | predicate NOT? BETWEEN predicate AND predicate                #betweenPredicate
     | left=predicate NOT? LIKE right=predicate
       (ESCAPE STRING_LITERAL)?                                      #likePredicate
