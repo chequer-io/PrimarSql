@@ -118,6 +118,7 @@ FOR:                                 'FOR';
 COLUMN:                              'COLUMN';
 OBJECT:                              'OBJECT';
 JSON:                                'JSON';
+COUNT:                               'COUNT';
 
 NULL_LITERAL:                        'NULL';
 

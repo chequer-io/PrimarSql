@@ -467,6 +467,7 @@ builtInFunctionCall
                 | fromExpression=expression
             )
         ')'                                                           #trimFunctionCall
+    | COUNT '(' '*' ')'                                               #countFunctionCall
     ;
 
 nativeFunctionCall
