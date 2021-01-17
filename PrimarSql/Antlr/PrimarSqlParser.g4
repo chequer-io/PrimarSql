@@ -126,6 +126,8 @@ insertStatementValue
     | insertFormat=(VALUES | VALUE)
       '(' expressionsWithDefaults? ')'
         (',' '(' expressionsWithDefaults? ')')*
+    | insertFormat=(VALUES | VALUE)
+        jsonObject (',' expressionsWithDefaults)*
     ;
 
 orderClause
@@ -192,14 +194,29 @@ startKeyClause
 
 // update statements
 
+removedElement
+    : fullColumnName
+    ;
+
 updatedElement
-    : fullColumnName '=' (expression | DEFAULT)
+    : fullColumnName '=' (expression | arrayExpression | arrayAddExpression | DEFAULT)
+    ;
+
+updateRemoveItem
+    : REMOVE removedElement (',' removedElement)* 
+    ;
+
+updateSetItem
+    : SET updatedElement (',' updatedElement)*
+    ;
+
+updateItem
+    : updateSetItem
+    | updateRemoveItem
     ;
 
 updateStatement
-    : UPDATE tableName
-        SET updatedElement (',' updatedElement)*
-        (whereKeyword=WHERE expression)? limitClause?
+    : UPDATE tableName updateItem (whereKeyword=WHERE expression)? limitClause?
     ;
 
 // delete statements
@@ -325,6 +342,14 @@ nullNotnull
     : NOT? nullLiteral
     ;
 
+arrayExpression
+    : '[' constant (',' constant)* ']'
+    ;
+
+arrayAddExpression
+    : '<<' constant (',' constant)* '>>'
+    ;
+
 constant
     : stringLiteral                                                 #stringLiteralConstant
     | decimalLiteral                                                #positiveDecimalLiteralConstant
@@ -391,14 +416,14 @@ expression
     ;
 
 predicate
-    : predicate NOT? IN '(' (selectStatement | expressions) ')'     #inPredicate
-    | predicate IS nullNotnull                                      #isNullPredicate
-    | left=predicate comparisonOperator right=predicate             #binaryComparisonPredicate
-    | predicate NOT? BETWEEN predicate AND predicate                #betweenPredicate
+    : predicate NOT? IN ('(' (selectStatement | expressions) ')'| '[' (selectStatement | expressions) ']')     #inPredicate
+    | predicate IS nullNotnull                                                                                 #isNullPredicate
+    | left=predicate comparisonOperator right=predicate                                                        #binaryComparisonPredicate
+    | predicate NOT? BETWEEN predicate AND predicate                                                           #betweenPredicate
     | left=predicate NOT? LIKE right=predicate
-      (ESCAPE STRING_LITERAL)?                                      #likePredicate
-    | left=predicate NOT? regex=(REGEXP | RLIKE) right=predicate    #regexpPredicate
-    | expressionAtom                                                #expressionAtomPredicate
+      (ESCAPE STRING_LITERAL)?                                                                                 #likePredicate
+    | left=predicate NOT? regex=(REGEXP | RLIKE) right=predicate                                               #regexpPredicate
+    | expressionAtom                                                                                           #expressionAtomPredicate
     ;
 
 expressionAtom

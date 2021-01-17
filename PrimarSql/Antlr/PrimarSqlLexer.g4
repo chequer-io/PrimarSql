@@ -119,6 +119,7 @@ COLUMN:                              'COLUMN';
 OBJECT:                              'OBJECT';
 JSON:                                'JSON';
 COUNT:                               'COUNT';
+REMOVE:                              'REMOVE';
 
 NULL_LITERAL:                        'NULL';
 
@@ -157,6 +158,8 @@ L_BRACKET:                           '[';
 R_BRACKET:                           ']';
 JSON_L_BRACKET:                      '{';
 JSON_R_BRACKET:                      '}';
+ARRADD_L_BRACKET:                    '<<';
+ARRADD_R_BRACKET:                    '>>';
 COMMA:                               ',';
 SEMI:                                ';';
 AT_SIGN:                             '@';
