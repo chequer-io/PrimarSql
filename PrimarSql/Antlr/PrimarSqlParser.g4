@@ -122,12 +122,12 @@ selectStatement
     ;
 
 insertStatementValue
-    : selectStatement
+    : selectStatement                                       #subqueryInsertStatement
     | insertFormat=(VALUES | VALUE)
       '(' expressionsWithDefaults? ')'
-        (',' '(' expressionsWithDefaults? ')')*
+        (',' '(' expressionsWithDefaults? ')')*             #expressionInsertStatement
     | insertFormat=(VALUES | VALUE)
-        jsonObject (',' expressionsWithDefaults)*
+        jsonObject (',' jsonObject)*                        #jsonInsertStatement
     ;
 
 orderClause
