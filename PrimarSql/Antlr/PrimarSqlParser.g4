@@ -285,6 +285,7 @@ uid
 simpleId
     : ID
     | STRING_LITERAL
+    | keywords
     ;
 
 dottedId
@@ -528,4 +529,116 @@ bitOperator
 
 mathOperator
     : '*' | '/' | '%' | DIV | MOD | '+' | '-' | '--'
+    ;
+
+keywords
+    : 
+    | SELECT
+    | STRONGLY
+    | EVENTUALLY
+    | AS
+    | FROM
+    | WHERE
+    | GROUP
+    | BY
+    | WITH
+    | LIMIT
+    | LIMITS
+    | OFFSET
+    | TRUE
+    | FALSE
+    | VARCHAR
+    | TEXT
+    | MEDIUMTEXT
+    | LONGTEXT
+    | STRING
+    | INT
+    | INTEGER
+    | BIGINT
+    | BOOL
+    | BOOLEAN
+    | LIST
+    | BINARY
+    | NUMBER_LIST
+    | STRING_LIST
+    | BINARY_LIST
+    | ORDER
+    | CREATE
+    | INDEX
+    | INDEXES
+    | ON
+    | LOCAL
+    | GLOBAL
+    | ALL
+    | KEYS
+    | ONLY
+    | INCLUDE
+    | TABLE
+    | TABLES
+    | HASH
+    | KEY
+    | RANGE
+    | THROUGHPUT
+    | BILLINGMODE
+    | PROVISIONED
+    | PAY_PER_REQUEST
+    | ON_DEMAND
+    | ALTER
+    | ADD
+    | DROP
+    | INSERT
+    | IGNORE
+    | INTO
+    | VALUES
+    | VALUE
+    | ASC
+    | DESC
+    | DESCRIBE
+    | NOT
+    | IF_NOT_EXISTS
+    | ATTRIBUTE_EXISTS
+    | ATTRIBUTE_NOT_EXISTS
+    | ATTRIBUTE_TYPE
+    | BEGINS_WITH
+    | CONTAINS
+    | SIZE
+    | IF
+    | EXISTS
+    | DEFAULT
+    | BETWEEN
+    | AND
+    | LIKE
+    | REGEXP
+    | RLIKE
+    | IN
+    | IS
+    | SOME
+    | ESCAPE
+    | ROW
+    | XOR
+    | OR
+    | START
+    | ENDPOINTS
+    | SHOW
+    | UPDATE
+    | SET
+    | DELETE
+    | PARTITION
+    | SORT
+    | CURRENT_DATE
+    | CURRENT_TIME
+    | CURRENT_TIMESTAMP
+    | CAST
+    | SUBSTR
+    | SUBSTRING
+    | TRIM
+    | BOTH
+    | LEADING
+    | TRAILING
+    | FOR
+    | COLUMN
+    | OBJECT
+    | JSON
+    | COUNT
+    | REMOVE
     ;
