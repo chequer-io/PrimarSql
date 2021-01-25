@@ -532,8 +532,7 @@ mathOperator
     ;
 
 keywords
-    : 
-    | SELECT
+    : SELECT
     | STRONGLY
     | EVENTUALLY
     | AS
