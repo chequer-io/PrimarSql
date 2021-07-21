@@ -122,8 +122,7 @@ selectStatement
     ;
 
 insertStatementValue
-    : selectStatement                                       #subqueryInsertStatement
-    | insertFormat=(VALUES | VALUE)
+    : insertFormat=(VALUES | VALUE)
       '(' expressionsWithDefaults? ')'
         (',' '(' expressionsWithDefaults? ')')*             #expressionInsertStatement
     | insertFormat=(VALUES | VALUE)
@@ -140,8 +139,7 @@ tableSource
     ;
 
 tableSourceItem
-    : tableName (AS? alias=uid)?                                    #atomTableItem
-    | '(' parenthesisSubquery=selectStatement ')' (AS? alias=uid)?  #subqueryTableItem
+    : tableName
     ;
 
 // Select Statement
@@ -417,7 +415,7 @@ expression
     ;
 
 predicate
-    : predicate NOT? IN ('(' (selectStatement | expressions) ')'| '[' (selectStatement | expressions) ']')     #inPredicate
+    : predicate NOT? IN ('(' expressions ')'| '[' expressions ']')                                             #inPredicate
     | predicate IS nullNotnull                                                                                 #isNullPredicate
     | left=predicate comparisonOperator right=predicate                                                        #binaryComparisonPredicate
     | predicate NOT? BETWEEN predicate AND predicate                                                           #betweenPredicate
@@ -434,8 +432,6 @@ expressionAtom
     | fullColumnName                                                #fullColumnNameExpressionAtom
     | functionCall                                                  #functionCallExpressionAtom
     | '(' expression (',' expression)* ')'                          #nestedExpressionAtom
-    | EXISTS '(' selectStatement ')'                                #existsExpressionAtom
-    | '(' selectStatement ')'                                       #subqueryExpressionAtom
     | left=expressionAtom bitOperator right=expressionAtom          #bitExpressionAtom
     | left=expressionAtom mathOperator right=expressionAtom         #mathExpressionAtom
     ;
@@ -445,7 +441,7 @@ expressionAtom
 functionCall
     : builtInFunctionCall
     | nativeFunctionCall
-    ; 
+    ;
 
 builtInFunctionCall
     : ( CURRENT_DATE | CURRENT_TIME | CURRENT_TIMESTAMP )           #timeFunctionCall
