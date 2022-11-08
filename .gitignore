@@ -584,3 +584,4 @@ $RECYCLE.BIN/
 **/Antlr/generated/
 *.interp
 *.tokens
+.idea
