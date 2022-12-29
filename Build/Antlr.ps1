@@ -2,9 +2,9 @@ $AntlrJar = Resolve-Path ".\Build\antlr-4.11.1-complete.jar"
 
 Function Antlr-Generate {
 
-    $ProjectName = "PrimarSql"
+    $ProjectName = "PrimarSql.Parser"
     $ProjectDirectory = $(Resolve-Path $ProjectName)
-    $Namespace = "PrimarSql.Internal"
+    $Namespace = "PrimarSql.Parser.Internal"
     $GrammarDirectory = [System.IO.Path]::Combine($ProjectDirectory, "Antlr")
     $OutputDirectory = [System.IO.Path]::Combine($GrammarDirectory, "generated")
 
@@ -31,7 +31,7 @@ Function Antlr-Generate {
         -o $OutputDirectory `
         $GrammarDirectory/*.g4 `
         -no-listener `
-        -no-visitor
+        -visitor
 
     if ($LASTEXITCODE -ne 0) {
         throw "[Antlr4] $($ProjectName) Failed generate"
@@ -47,7 +47,7 @@ Function Antlr-Generate {
         Write-Host " Patch $($PSItem.Name)" -ForegroundColor Yellow
 
         $Content = Get-Content -Path $PSItem -Raw
-        # $Content = $Content -replace 'public(?= +(?:interface|(?:partial +)?class) +[\w<>]+)', 'internal'
+        $Content = $Content -replace 'public(?= +(?:interface|(?:partial +)?class) +[\w<>]+)', 'internal'
         $Content = $Content -replace '\s+\[System\.CLSCompliant\(false\)\]', ''
 
         Set-Content -Path $PSItem -Value $Content

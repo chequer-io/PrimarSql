@@ -24,5 +24,9 @@
         <None Include="..\Logo.png" PackagePath="" Pack="True" />
         <None Include="..\LICENSE" PackagePath="" Pack="True" />
     </ItemGroup>
+    
+    <ItemGroup>
+      <Folder Include="Antlr" />
+    </ItemGroup>
 
 </Project>
