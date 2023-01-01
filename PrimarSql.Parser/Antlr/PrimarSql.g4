@@ -24,6 +24,7 @@ singleStatement
 
 statement
     : queryNoWith                                                            #statementDefault
+    | INSERT INTO qualifiedName columnAliases? query                         #insertInto
     ;
 
 query
@@ -219,7 +220,7 @@ expression
     ;
 
 booleanExpression
-    : valueExpression predicate                                    #predicated
+    : valueExpression predicate?                                   #predicated
     | NOT booleanExpression                                        #logicalNot
     | left=booleanExpression operator=AND right=booleanExpression  #logicalBinary
     | left=booleanExpression operator=OR right=booleanExpression   #logicalBinary
@@ -249,7 +250,7 @@ valueExpression
 primaryExpression
     : NULL                                                                                #nullLiteral
     | interval                                                                            #intervalLiteral
-    | identifier string                                                             #typeConstructor
+    | identifier string                                                                   #typeConstructor
     | DOUBLE PRECISION string                                                             #typeConstructor
     | number                                                                              #numericLiteral
     | booleanValue                                                                        #booleanLiteral
@@ -308,7 +309,6 @@ parameterExpression
 
 string
     : STRING                                #basicStringLiteral
-    | UNICODE_STRING (UESCAPE STRING)?      #unicodeStringLiteral
     ;
 
 timeZoneSpecifier
@@ -488,7 +488,6 @@ identifier
     | i=QUOTED_IDENTIFIER           #quotedIdentifier
     | ki=nonReserved                #unquotedIdentifier
     | i=BACKQUOTED_IDENTIFIER       #backQuotedIdentifier
-    | i=DIGIT_IDENTIFIER            #digitIdentifier
     ;
 
 number
@@ -801,10 +800,6 @@ DOUBLE_VALUE
 
 IDENTIFIER
     : (LETTER | '_') (LETTER | DIGIT | '_')*
-    ;
-
-DIGIT_IDENTIFIER
-    : DIGIT (LETTER | DIGIT | '_')+
     ;
 
 QUOTED_IDENTIFIER

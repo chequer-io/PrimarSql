@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PrimarSql.Csv\PrimarSql.Csv.csproj" />
+    <ProjectReference Include="..\PrimarSql.Engine\PrimarSql.Engine.csproj" />
+  </ItemGroup>
+
+</Project>
