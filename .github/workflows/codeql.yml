@@ -43,6 +43,12 @@ jobs:
         submodules: true
         lfs: true
 
+    - name: Setup JDK
+      uses: actions/setup-java@v3
+      with:
+        distribution: corretto
+        java-version: '11'
+
     - name: Build Antlr
       shell: pwsh
       run: pwsh ./Setup.ps1
